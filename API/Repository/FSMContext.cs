@@ -10,6 +10,8 @@ namespace API.Repository
         public DbSet<Player> player { get; set; }
         public DbSet<Scrim> scrim { get; set; }
         public DbSet<Team> team { get; set; }
+        public DbSet<User> user { get; set; }
+        public DbSet<AccountRecovery> accountrecovery { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

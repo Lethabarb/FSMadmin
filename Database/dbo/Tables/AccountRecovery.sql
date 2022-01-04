@@ -1,0 +1,7 @@
+﻿CREATE TABLE [dbo].[AccountRecovery]
+(
+	[Id] UNIQUEIDENTIFIER NOT NULL PRIMARY KEY, 
+    [Email] NVARCHAR(MAX) NOT NULL, 
+    [Used] BIT NOT NULL DEFAULT 0, 
+    [TimeStamp] DATETIME NOT NULL
+)

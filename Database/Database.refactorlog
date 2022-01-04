@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Operations Version="1.0" xmlns="http://schemas.microsoft.com/sqlserver/dac/Serialization/2012/02">
+  <Operation Name="Rename Refactor" Key="c03e847f-f8ac-4e9b-84fd-278076c73cb8" ChangeDateTime="01/01/2022 06:22:20">
+    <Property Name="ElementName" Value="[dbo].[User].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[User]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="EmailAddress" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="f132099a-a965-4a73-8acb-60779c6bddaa" ChangeDateTime="01/02/2022 07:21:14">
+    <Property Name="ElementName" Value="[dbo].[User].[Password]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[User]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="HashedPassword" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="c042842f-f886-45d6-931f-6dd89458d931" ChangeDateTime="01/02/2022 07:21:21">
+    <Property Name="ElementName" Value="[dbo].[User].[HashedPassword]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[User]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Password" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="9f1fc7ce-e3c2-4d88-9370-d3edf0fff4b9" ChangeDateTime="01/02/2022 07:34:00">
+    <Property Name="ElementName" Value="[dbo].[resetPassword].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[resetPassword]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="UserId" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="43894ba4-166a-47c0-88a6-020bf5085d96" ChangeDateTime="01/02/2022 07:34:02">
+    <Property Name="ElementName" Value="[dbo].[resetPassword].[UserId]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[resetPassword]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Id" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="f13d33ef-1929-4744-bc23-8db17a189e1d" ChangeDateTime="01/02/2022 07:34:11">
+    <Property Name="ElementName" Value="[dbo].[resetPassword].[userId]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[resetPassword]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Email" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="7d767364-b5e9-4389-a7df-3042914be4d5" ChangeDateTime="01/02/2022 07:34:59">
+    <Property Name="ElementName" Value="[dbo].[resetPassword].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[resetPassword]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="token" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="c249cfac-c8ff-4993-ad6a-911f2f1974dc" ChangeDateTime="01/04/2022 00:28:17">
+    <Property Name="ElementName" Value="[dbo].[AccountRecovery].[token]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[AccountRecovery]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Id" />
+  </Operation>
+</Operations>

@@ -14,3 +14,5 @@ global using Microsoft.AspNetCore.Authentication.JwtBearer;
 global using Microsoft.AspNetCore.Authorization;
 global using API.Entities;
 global using API.Repository;
+using System.Net;
+using System.Net.Mail;
