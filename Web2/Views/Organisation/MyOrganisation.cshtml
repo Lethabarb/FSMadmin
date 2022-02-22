@@ -1,0 +1,234 @@
+﻿@model Organisation
+<div id="OrganisationDetails"></div>
+<div class="OrgHeader" id="OrgHeader">
+    <p class="OrgHeaderTitle">Organisation Dashboard</p>
+    <ul>
+        <li>
+            <a href="#OrganisationDetails" id="OrgHead1" class="OrgHeadItem OrgHeadSelect">Org</a>
+        </li>
+        <li>
+            <a href="#OrganisationTeams" id="OrgHead2" class="OrgHeadItem">Teams</a>
+        </li>
+        <li>
+            <a href="#Bot" id="OrgHead3" class="OrgHeadItem">Bot</a>
+        </li>
+    </ul>
+
+</div>
+<div>
+    <div id="OrgForm" class="FormContainer">
+        @using(Html.BeginForm("UpdateOrganisation", "Organisation", FormMethod.Post,new {@class = "OrgForm", id="OrgForm", autocomplete = "off", enctype = "multipart/form-data"}))
+        {
+            <div class="ImageMargin FormSection">
+                <div class="ImageUploadContainer">
+                    <div class="OrgFrame" id="frame"></div>
+                    <input id="image" type="file" name="file" accept="image/*" class="FormInputImage">
+                </div>
+                <input asp-for="name" id="OrgName" name="OrgName" class="FormInput" placeholder="Name" />
+                <input asp-for="shortName" id="OrgShort" name="OrgShort" class="FormInput SmallInput"
+                     placeholder="Abbreviation" />
+        </div>
+        <div class="FormSection">
+            <input type="submit" id="OrgSave" class="FormSubmit" value="Save" />
+        </div>
+        }
+
+    </div>
+
+
+    <div class="FormContainer" id="OrgDisplay">
+        <div class="FormSection ImageMargin">
+            <div class="ImageUploadContainer">
+                <div class="OrgDisplayFrame" id="Displayframe"></div>
+            </div>
+            <h1 class="FormDisplay" id="OrgName">@Model.name</h1>
+            <h2 class="FormDisplay" id="OrgShort">@Model.shortName</h2>
+        </div>
+        <div class="FormSection">
+            <input type="button" id="OrgEdit" value="Edit" class="FormSubmit" />
+        </div>
+        <div id="OrganisationTeams"></div>
+    </div>
+</div>
+
+
+<div class="Section">
+    <div class="SectionTitle">
+        <h1>Teams</h1>
+        @Html.ActionLink("+", "CreateTeam", "Team", null, new {@class = "FormSubmit"})
+    </div>
+        @if (@Model.teams.Count() < 1)
+        {
+            <h1 class="SectionTitle">You have no Teams</h1>
+        }
+    <div class="MyTeams">
+        @if (Model.teams.Count() >= 1) {
+        @foreach (Team t in Model.teams)
+        {
+        <div class="Team">
+             <div class="ImageCenter">
+                <img src="/TeamImages/@t.ImageName" alt="@t.name TeamLogo" class="TeamLogo">
+             </div>
+            <p class="TeamName">@t.name</p>
+            <p class="TeamRank">@t.rank</p>
+            <div class="ImageCenter">
+                @Html.ActionLink("Edit", "EditTeam", "Team", new {id = t.id}, new {@class = "TeamEdit"} )
+            </div>
+            <table class="TeamTable">
+                        @foreach (Player p in t.players)
+                        {
+                            <tr>
+                                <td>
+                                    @if (p.prole == "Tank")
+                                    {
+                                        <div class="TeamPlayer">
+                                            <img src="~/images/tank.png" alt="tank" class="RoleIcon" />
+                                            <p class="PlayerName">@p.battlenet</p>
+                                        </div>
+                                    } else if (p.prole == "DPS")
+                                    {
+                                         <div class="TeamPlayer">
+                                            <img src="~/images/dps.png" alt="DPS" class="RoleIcon" />
+                                            <p class="PlayerName">@p.battlenet</p>
+                                        </div>
+                                    } else if (p.prole == "Support")
+                                    {
+                                        <div class="TeamPlayer">
+                                            <img src="~/images/support.png" alt="support" class="RoleIcon" />
+                                            <p class="PlayerName">@p.battlenet</p>
+                                        </div>
+                                    } else
+                                    {
+                                        <div class="TeamPlayer">
+                                            <img src="~/images/flex.png" alt="flex" class="RoleIcon" />
+                                            <p class="PlayerName">@p.battlenet</p>
+                                        </div>
+                                    }
+                                </td>
+                            </tr>
+                        }
+            </table>
+            <input type="button" value="Scrims" class="FormSubmit">
+        </div>
+        }
+        }
+        
+
+        <div id="Bot"></div>
+    </div>
+</div>
+
+<div>
+
+    <h1 id="TitleSection">Bot Configuration</h1>
+    <div id="BotForm" class="FormContainer">
+        @if (@Model.teams.Count() < 1)
+        {
+            <h1 class="SectionTitle">You have no Teams</h1>
+        } else {
+                <div class="FormSection">
+                    <div class="ConfigGrid">
+                        <label class="FormLabel">Guild ID</label>
+                        <label class="FormLabel">Bot Channel ID</label>
+                        <input class="FormInput" placeholder="Guild ID" value="@Model.Config.GuildId">
+                        <input class="FormInput" placeholder="Bot Channel" value="@Model.Config.BotChannel">
+                    </div>
+                </div>
+                <table class="ConfigTable">
+                    <tbody>
+                        <tr>
+                            <th></th>
+                            <th>
+                                <label class="FormLabel">Timetable Channel ID</label>
+                            </th>
+                            <th>
+                                <label class="FormLabel">Captain User ID</label>
+                            </th>
+                        </tr>
+                        @foreach (Team t in @Model.teams)
+                        {
+                        <tr>
+                            <td>
+                                <label class="FormLabel">@t.name</label>
+                            </td>
+                            <td>
+                                <input class="FormInput BotConfig" placeholder="Channel" value="@Model.Config.Teams.Where(TC => TC.Name == t.name).FirstOrDefault().TimetableId" />
+                            </td>
+                            <td>
+                                <input class="FormInput BotConfig" placeholder="Captain" value="@Model.Config.Teams.Where(TC => TC.Name == t.name).FirstOrDefault().CaptainId" />
+                            </td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+
+        }
+        <div class="FormSection">
+            <input type="submit" id="OrgSave" class="FormSubmit" value="Save" />
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    var DisplayImage = document.getElementById("Displayframe");
+    var InputImage = document.getElementById("frame");
+    const file = document.getElementById('image');
+    const reader = new FileReader();
+    @{
+        //url("../OrgImages/faea3341-57a6-4892-aea8-3f2ef28d7d13logo128.gif")
+        string ImagePath = $"/OrgImages/{@Model.ImageName}";
+    }
+    DisplayImage.style.backgroundImage = "url(@ImagePath)";
+    InputImage.style.backgroundImage = "url(@ImagePath)";
+    var OrgForm = document.getElementById("OrgForm");
+    var OrgDisplay = document.getElementById("OrgDisplay");
+    var edit = document.getElementById("OrgEdit");
+    var save = document.getElementById("OrgSave");
+    var OrgHeader = document.getElementById("OrgHeader");
+    var OrgHead1 = document.getElementById("OrgHead1");
+    var OrgHead2 = document.getElementById("OrgHead2");
+    var OrgHead3 = document.getElementById("OrgHead3");
+    OrgForm.style.display = "none";
+    edit.onclick = function () {
+        OrgDisplay.style.display = "none";
+        OrgForm.style.display = "block";
+        InputImage.style.backgroundImage = "url(@ImagePath)";
+    }
+    save.onclick = function () {
+        OrgDisplay.style.display = "block";
+        OrgForm.style.display = "none";
+    }
+
+    var ScrollPos = 0;
+
+    document.addEventListener('scroll', function (e) {
+        console.log(document.body.scrollTop);
+        if (document.body.scrollTop >= 50 || document.documentElement.scrollTop > 50) {
+            OrgHeader.style.top = "0vh";
+        } else {
+            var sub = document.body.scrollTop;
+            if (sub > 50) {
+                sub = 50;
+            }
+            var top = 50-sub;
+            OrgHeader.style.top = top.toString();
+        }
+        if (document.body.scrollTop >= 46 && document.body.scrollTop < 93.6666667 * @Model.teams.Count()) {
+            OrgHead1.classList.add("OrgHeadSelect");
+            OrgHead2.classList.remove("OrgHeadSelect");
+            OrgHead3.classList.remove("OrgHeadSelect");
+        } else if (document.body.scrollTop >= 93.6666667 * @Model.teams.Count() && document.body.scrollTop < 333.333333 * @Model.teams.Count()) {
+            OrgHead1.classList.remove("OrgHeadSelect");
+            OrgHead2.classList.add("OrgHeadSelect");
+            OrgHead3.classList.remove("OrgHeadSelect");
+        } else if (document.body.scrollTop >= 333.333333 * @Model.teams.Count()) {
+            OrgHead1.classList.remove("OrgHeadSelect");
+            OrgHead2.classList.remove("OrgHeadSelect");
+            OrgHead3.classList.add("OrgHeadSelect");
+        }
+        
+    });
+
+</script>
+}

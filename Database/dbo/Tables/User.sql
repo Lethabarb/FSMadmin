@@ -4,6 +4,7 @@
 	[EmailAddress] NVARCHAR(MAX) NOT NULL, 
     [Username] NVARCHAR(MAX) NOT NULL, 
     [Password] NVARCHAR(MAX) NOT NULL, 
-    [Role] NVARCHAR(MAX) NULL, 
-    [DiscordUserId] NUMERIC(20) NULL
+    [Role] NVARCHAR(MAX) NOT NULL DEFAULT 'Basic', 
+    [DiscordUserId] NUMERIC(20) NOT NULL DEFAULT 00000000000000000000, 
+    [Token] NVARCHAR(MAX) NOT NULL DEFAULT 'NoToken' 
 )

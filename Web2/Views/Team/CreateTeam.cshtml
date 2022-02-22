@@ -1,0 +1,138 @@
+﻿@model Team
+<div class="FormContainer" id="Orgform">
+    @using (Html.BeginForm("TeamCreate","Team",FormMethod.Post,new {@class = "OrgForm", id="OrgForm", autocomplete = "off", enctype = "multipart/form-data"}))
+    {
+        <div class="ImageMargin FormSection">
+            <div class="ImageUploadContainer">
+                <div class="OrgFrame" id="frame"></div>
+                <input id="image" type="file" name="file" accept="image/*" class="FormInputImage">
+             </div>
+            <input asp-for="name" id="OrgName" name="name" class="FormInput" placeholder="Name" />
+        </div>
+        
+        <div class="FormSection">
+            <label class="FormLabel">Captain</label>
+            <input asp-for="captain" name="captain" class="FormInput" placeholder="DiscordCaptainId">
+        </div>
+        
+        <div class="FormSection">
+            <label class="FormLabel">Rank</label>
+            <input asp-for="rank" name="rank" class="FormInput" placeholder="TeamRank">
+        </div>
+        
+        <div class="FormSection">
+            <label class="FormLabel">TimeTableId</label>
+            <input name="TimeTable" class="FormInput" placeholder="TeamRank">
+        </div>
+        <div class="Section">
+            <h3>Players</h3>
+        </div>
+        <div id="playerList">
+            <div class="FormSection">
+                <input type="text" placeholder="Discord" id="Discord" class="FormInput BotConfig">
+                <input type="text" placeholder="BattleNet" id="BattleNet" class="FormInput BotConfig">
+                <select id="Role" class="FormInput BotConfig">
+                    <option>
+                        Tank
+                    </option>
+                    <option>
+                        DPS
+                    </option>
+                    <option>
+                        Support
+                    </option>
+                    <option>
+                        Flex
+                    </option>
+                </select>
+            </div>
+            
+        </div>
+        <input type="button" value="add player" class="FormSubmit" id="AddPlayer">
+        <input type="text" name="Players" id="Players" hidden>
+        <div class="FormSection">
+            <input type="submit" id="FormSubmit" class="FormSubmit" onclick="formsubmit()" />
+        </div>
+    }
+</div>
+@section Scripts {
+    <script type="text/javascript">
+        var players = document.getElementById("Players");
+        var addPlayer = document.getElementById("AddPlayer");
+        var FormSubmit = document.getElementById("FormSubmit");
+        var PlayerList = document.getElementById("playerList");
+
+        const frame = document.getElementById('frame');
+        const file = document.getElementById('image');
+        const reader = new FileReader();
+
+        reader.addEventListener("load", function () {
+            frame.style.backgroundImage = `url(${reader.result})`;
+        }, false);
+
+        file.addEventListener('change', function () {
+            const image = this.files[0];
+            var size = ((image.size/1024)/1024).toFixed(4);
+            if (size > 2) {
+                this.value = "";
+                showError();
+            }
+            if (image) reader.readAsDataURL(image);
+        }, false)
+
+        addPlayer.onclick = function () {
+            var newChild = document.createElement('div');
+            newChild.classList.add("FormSection");
+            newChild.innerHTML =   `
+                <input type="text" placeholder="Discord" id="Discord" class="FormInput BotConfig">
+                <input type="text" placeholder="BattleNet" id="BattleNet" class="FormInput BotConfig">
+                <select id="Role" class="FormInput BotConfig">
+                    <option>
+                        Tank
+                    </option>
+                    <option>
+                        DPS
+                    </option>
+                    <option>
+                        Support
+                    </option>
+                    <option>
+                        Flex
+                    </option>
+                </select>
+                <input type="button" class="remove" value="x" onclick="removePlayer(this)">
+                `;
+                PlayerList.appendChild(newChild);
+        }
+        function formsubmit() {
+            var PlayerListElements = PlayerList.getElementsByClassName("FormSection");
+            console.log(PlayerListElements)
+            var str = "[";
+            var first = true;
+            for (var i = 0; i < PlayerListElements.length; i++) {
+                if (!first) {
+                    str += ",";
+                } else {
+                    first = false;
+                }
+                str += "{"
+                var Discord = PlayerListElements.item(i).querySelector("#Discord");
+                var BattleNet = PlayerListElements.item(i).querySelector("#BattleNet");
+                var Role = PlayerListElements.item(i).querySelector("#Role");
+                str += '"Discord" : "' + Discord.value + '",';
+                str += '"battlenet" : "' + BattleNet.value + '",';
+                str += '"prole" : "' + Role.value + '"}';
+            }
+            str += "]";
+            players.value = str;
+            return true;
+        }
+
+        function removePlayer(e) {
+            console.log("hi");
+            var parent = e.parentElement;
+            console.log(parent);
+            PlayerList.removeChild(parent);
+        };
+    </script>
+}

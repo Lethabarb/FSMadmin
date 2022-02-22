@@ -1,0 +1,84 @@
+﻿@using System.Web.Helpers
+@model Organisation
+<div class="ErrorContainer" id="error">
+    <p class="Error"><strong>ERROR: </strong> Image too big.</p>
+</div>
+<div class="FormContainer" id="Orgform">
+    @using (Html.BeginForm("OrganisationCreate","Organisation",FormMethod.Post,new {@class = "OrgForm", id="OrgForm", autocomplete = "off", enctype = "multipart/form-data"}))
+    {
+        <div class="ImageMargin FormSection">
+            <div class="ImageUploadContainer">
+                <div class="OrgFrame" id="frame"></div>
+                <input id="image" type="file" name="file" accept="image/*" class="FormInputImage">
+             </div>
+            <input asp-for="name" id="OrgName" name="OrgName" class="FormInput" placeholder="Name" />
+            <input asp-for="shortName" id="OrgShort" name="OrgShort" class="FormInput SmallInput" placeholder="Abbreviation" />
+        </div>
+        <div class="FormSection">
+            <input asp-for="guildId" name="GuildId" class="FormInput" placeholder="Discord Server Id">
+        </div>
+                <div class="FormSection">
+            <input name="ChannelId" class="FormInput" placeholder="Bot Channel Id">
+        </div>
+        <div class="FormSection">
+            <input type="submit" id="FormSubmit" class="FormSubmit" />
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+        const frame = document.getElementById('frame');
+        var error = document.getElementById("error");
+        const file = document.getElementById('image');
+        const reader = new FileReader();
+        const name = document.getElementById('OrgName');
+        var nameAbbr = document.getElementById("OrgShort");
+
+        reader.addEventListener("load", function () {
+            frame.style.backgroundImage = `url(${reader.result})`;
+        }, false);
+
+        file.addEventListener('change', function () {
+            const image = this.files[0];
+            var size = ((image.size/1024)/1024).toFixed(4);
+            if (size > 2) {
+                this.value = "";
+                showError();
+            }
+            if (image) reader.readAsDataURL(image);
+        }, false)
+
+        name.addEventListener('keypress', function () {
+            const nameArr = name.value.split(" ");
+            var Abbreviation = "";
+            nameArr.forEach(element => {
+                Abbreviation += element.charAt(0).toUpperCase();
+            });
+            nameAbbr.value = Abbreviation;
+        })
+
+        function showError() {
+            form.style.margin = "0vh auto 0 auto";
+            error.style.display = "block";
+            setTimeout(function () {
+                error.style.left = "20px";
+                setTimeout(function () {
+                    error.style.left = "-20px";
+                    setTimeout(function () {
+                        error.style.left = "20px";
+                        setTimeout(function () {
+                            error.style.left = "-20px";
+                            setTimeout(function () {
+                                error.style.left = "20px";
+                                setTimeout(function () {
+                                    error.style.left = "0px";
+                                }, 100);
+                            }, 100);
+                        }, 000);
+                    }, 100);
+                }, 100);
+            }, 100);
+        }
+   </script>
+}

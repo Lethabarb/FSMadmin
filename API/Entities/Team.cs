@@ -2,9 +2,12 @@
 {
     public class Team
     {
-        public int id { get; set; }
+        public Guid id { get; set; }
         public string name { get; set; }
-        public int organisationId { get; set; }
-        public int captain { get; set; }
+        public Guid organisationId { get; set; }
+        public ulong captain { get; set; }
+        public int Rank { get; set; }
+        public string ImageName { get; set; }
+        public string ImagePath { get; set; }
     }
 }

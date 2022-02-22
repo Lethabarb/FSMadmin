@@ -69,13 +69,13 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
-IResult Login(UserLogin user, IUserService service, FSMContext context)
+string Login(UserLogin user, IUserService service, FSMContext context)
 {
-    if (!string.IsNullOrEmpty(user.Username) &&
+    if (!string.IsNullOrEmpty(user.Email) &&
         !string.IsNullOrEmpty(user.Password))
     {
         var loggedInUser = service.Get(user, context.Set<User>().ToList());
-        if (loggedInUser is null) return Results.NotFound("User not found");
+        if (loggedInUser is null) return "User not found";
 
         var claims = new[]
         {
@@ -98,19 +98,37 @@ IResult Login(UserLogin user, IUserService service, FSMContext context)
 
         var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
 
-        return Results.Ok(tokenString);
+        return tokenString;
     }
-    return Results.BadRequest("Invalid user credentials");
+    return "Invalid user credentials";
 }
 
 app.MapPost("/login", (UserLogin user, IUserService service, [FromServices] FSMContext context) => {
     user.Password = sha256_hash(user.Password);
-    return Login(user, service, context);
+    var token = Login(user, service, context).ToString();
+    User myUser = new();
+    if (token != "Invalid user credentials" && token != "User not found")
+    {
+        myUser = context.Set<User>().Where(u => u.EmailAddress == user.Email).FirstOrDefault();
+        myUser.Token = token;
+        context.Set<Login>().Add(new Login()
+        {
+            UserId = myUser.Id
+        });
+        context.SaveChanges();
+        return myUser;
+    }
+    myUser.EmailAddress = "Invalid";
+    return myUser;
     }).Accepts<UserLogin>("application/json")
-    .Produces<string>().AllowAnonymous();
+    .Produces<User>().AllowAnonymous();
 
+app.MapGet("/logins", ([FromServices] FSMContext context) =>
+{
+    return context.Set<Login>().ToList();
+});
 
-String sha256_hash(string value)
+string sha256_hash(string value)
 {
     StringBuilder Sb = new StringBuilder();
 
@@ -127,33 +145,48 @@ String sha256_hash(string value)
 }
 
 
-app.MapPost("/regrister", /*[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Administrator")]*/ ([FromServices] FSMContext context, User user) =>
+app.MapPost("/regrister", ([FromServices] FSMContext context, User user) =>
 {
     string pass = user.Password;
     user.Password = sha256_hash(pass);
     user.Role = "basic";
+    user.Token = "noToken";
+    user.DiscordUserId = 0;
     context.Set<User>().Add(user);
     context.SaveChanges();
 }).AllowAnonymous();
 
-app.MapPost("/forgotpassword", ([FromServices] FSMContext context, String Email, IEmailService service) =>
+app.MapPost("/forgotpassword", ([FromServices] FSMContext context, Donkey Forgor, IEmailService service) =>
 {
     try
     {
-        var users = context.Set<User>().ToList();
-        User user = context.Set<User>().Where(u => u.EmailAddress == Email).First();
+        User user = context.Set<User>().Where(u => u.EmailAddress == Forgor.Value).First();
     } catch (Exception ex)
     {
         return Results.BadRequest("Email not found");
     }
-    AccountRecovery acc = service.SendEmail(Email);
-    context.Set<AccountRecovery>().Add(acc);
-    context.SaveChanges();
-    return Results.Ok("An email has been sent to recover the account");
+    List<AccountRecovery> prevRecoveries = context.Set<AccountRecovery>().Where(rec => rec.email == Forgor.Value).ToList();
+    bool Active = false;
+    foreach (AccountRecovery rec in prevRecoveries)
+    {
+        DateTime now = DateTime.Now;
+        if (!rec.used && rec.TimeStamp.AddHours(1) >= now)
+        {
+            Active = true;
+        }
+    }
+    if (!Active)
+    {
+        AccountRecovery acc = service.SendEmail(Forgor.Value);
+        context.Set<AccountRecovery>().Add(acc);
+        context.SaveChanges();
+        return Results.Ok("An email has been sent to recover the account");
+    }
+    return Results.BadRequest("There is already an active token");
 }).AllowAnonymous().Produces<string>();
 
 
-app.MapPost("/forgotpassword/{token}", ([FromServices] FSMContext context, Guid token, string newpass) =>
+app.MapPost("/forgotpassword/{token}", ([FromServices] FSMContext context, Guid token, Donkey newpass) =>
 {
     AccountRecovery acc;
     try
@@ -175,7 +208,8 @@ app.MapPost("/forgotpassword/{token}", ([FromServices] FSMContext context, Guid 
     else
     {
         User user = context.Set<User>().Where(u => u.EmailAddress == acc.email).First();
-        user.Password = newpass;
+        user.Password = newpass.Value;
+        context.SaveChanges();
         acc.used = true;
     }
     return Results.Ok("Successfully changed password");
@@ -187,24 +221,41 @@ app.MapPost("/forgotpassword/{token}", ([FromServices] FSMContext context, Guid 
 app.MapGet("/Organisation/getall", ([FromServices] FSMContext context) => {
     return context.Set<Organisation>().ToList();
 }).AllowAnonymous();
-app.MapGet("/Organisation/get/{id}", ([FromServices] FSMContext context, int id) =>
+app.MapGet("/Organisation/get/{id}", ([FromServices] FSMContext context, Guid id) =>
 {
     return context.Set<Organisation>().Where(x => x.id == id).FirstOrDefault();
 }).AllowAnonymous();
 app.MapPost("/Organisation/create", ([FromServices] FSMContext context, Organisation entity) =>
 {
+    if (entity.ImageName == "")
+    {
+        entity.ImageName = "default.png";
+        entity.ImagePath = "default.png";
+    }
     context.Set<Organisation>().Add(entity);
     context.SaveChanges();
-}).RequireAuthorization();
-app.MapPut("/Organisation/update/{id}", ([FromServices] FSMContext context, Organisation entity, int id) =>
+    return new Donkey() {
+        Value = entity.id.ToString()
+    };
+}).RequireAuthorization().Produces<Donkey>();
+app.MapPut("/Organisation/update/{id}", ([FromServices] FSMContext context, Organisation entity, Guid id) =>
 {
     Organisation old = context.Set<Organisation>().Where(x => x.id == id).FirstOrDefault();
-    old.name = entity.name;
-    old.guildId = entity.guildId;
+    if (entity.ImageName == "")
+    {
+        entity.ImageName = old.ImageName;
+        entity.ImagePath = old.ImagePath;
+    }
+
+    if (entity.name != "My Org") old.name = entity.name;
+    if (entity.shortName != "MO") old.shortName = entity.shortName;
+    if (entity.guildId != 0000000000000000000) old.guildId = entity.guildId;
     old.botConfig = entity.botConfig;
+    old.ImageName = entity.ImageName;
+    old.ImagePath = entity.ImagePath;
     context.SaveChanges();
 }).RequireAuthorization();
-app.MapDelete("/Organisation/delete/{id}", ([FromServices] FSMContext context, int id) =>
+app.MapDelete("/Organisation/delete/{id}", ([FromServices] FSMContext context, Guid id) =>
 {
     Organisation entity = context.Set<Organisation>().Where(x => x.id == id).FirstOrDefault();
     context.Set<Organisation>().Remove(entity);
@@ -230,7 +281,7 @@ app.MapPut("/Player/update/{id}", ([FromServices] FSMContext context, Player ent
     Player old = context.Set<Player>().Where(x => x.id == id).FirstOrDefault();
     old.discord = entity.discord;
     old.battlenet = entity.battlenet;
-    old.ulongId = entity.ulongId;
+    old.prole = entity.prole;
     context.SaveChanges();
 }).RequireAuthorization();
 app.MapDelete("/Player/delete/{id}", ([FromServices] FSMContext context, int id) =>
@@ -245,7 +296,7 @@ app.MapDelete("/Player/delete/{id}", ([FromServices] FSMContext context, int id)
 //#######################################
 app.MapGet("/Scrim/getall", ([FromServices] FSMContext context) => {
     return context.Set<Scrim>().ToList();
-}).RequireAuthorization();
+}).AllowAnonymous();
 app.MapGet("/Scrim/get/{id}", ([FromServices] FSMContext context, int id) =>
 {
     return context.Set<Scrim>().Where(x => x.id == id).FirstOrDefault();
@@ -259,7 +310,7 @@ app.MapPut("/Scrim/update/{id}", ([FromServices] FSMContext context, Scrim entit
 {
     Scrim old = context.Set<Scrim>().Where(x => x.id == id).FirstOrDefault();
     old.Team1 = entity.Team1;
-    old.team2 = entity.team2;
+    old.Team2 = entity.Team2;
     old.datetime = entity.datetime;
     context.SaveChanges();
 }).RequireAuthorization();
@@ -276,31 +327,60 @@ app.MapDelete("/Scrim/delete/{id}", ([FromServices] FSMContext context, int id) 
 app.MapGet("/Team/getall", ([FromServices] FSMContext context) => {
     return context.Set<Team>().ToList();
 }).AllowAnonymous();
-app.MapGet("/Team/get/{id}", ([FromServices] FSMContext context, int id) =>
+app.MapGet("/Team/get/{id}", ([FromServices] FSMContext context, Guid id) =>
 {
     return context.Set<Team>().Where(x => x.id == id).FirstOrDefault();
 }).AllowAnonymous();
 app.MapPost("/Team/create", ([FromServices] FSMContext context, Team entity) =>
 {
+    if (entity.ImageName == "")
+    {
+        entity.ImageName = "default.png";
+        entity.ImagePath = "default.png";
+    }
     context.Set<Team>().Add(entity);
     context.SaveChanges();
 }).RequireAuthorization();
-app.MapPut("/Team/update/{id}", ([FromServices] FSMContext context, Team entity, int id) =>
+app.MapPut("/Team/update/{id}", ([FromServices] FSMContext context, Team entity, Guid id) =>
 {
     Team old = context.Set<Team>().Where(x => x.id == id).FirstOrDefault();
-    old.name = entity.name;
-    old.captain = entity.captain;
+    if (entity.ImageName == "")
+    {
+        entity.ImageName = old.ImageName;
+    }
+    
+    if (entity.name != "myTeam") old.name = entity.name;
+    if (entity.captain != 00000000000000000000) old.captain = entity.captain;
     old.organisationId = entity.organisationId;
+    old.ImageName = entity.ImageName;
+    old.ImagePath = entity.ImagePath;
     context.SaveChanges();
 }).RequireAuthorization();
-app.MapDelete("/Team/delete/{id}", ([FromServices] FSMContext context, int id) =>
+app.MapDelete("/Team/delete/{id}", ([FromServices] FSMContext context, Guid id) =>
 {
     Team entity = context.Set<Team>().Where(x => x.id == id).FirstOrDefault();
     context.Set<Team>().Remove(entity);
+    List<Player> players = context.Set<Player>().Where(p => p.TeamId == id).ToList();
+    foreach (Player p in players)
+    {
+        context.Set<Player>().Remove(p);
+    }
     context.SaveChanges();
 }).RequireAuthorization();
 
+app.MapPost("/Organisation/AddUser", ([FromServices] FSMContext context, OrganisationUsers entity) =>
+{
+    if (context.Set<OrganisationUsers>().Where(e => e.UserId == entity.UserId).ToList().Count < 1)
+    {
+        context.Set<OrganisationUsers>().Add(entity);
+        context.SaveChanges();
+    }
+}).RequireAuthorization();
 
+
+app.MapGet("/OrganisationUsers", ([FromServices] FSMContext context) => {
+    return context.Set<OrganisationUsers>().ToList();
+}).AllowAnonymous();
 app.MapControllers();
 
 app.Run();

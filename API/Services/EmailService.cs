@@ -19,7 +19,7 @@ namespace API.Services
             try
             {
 
-                string link = "https://fsmorg.com/accountrecovery/" + guid.ToString();
+                string link = "https://localhost:7244/account/resetpassword?Id=" + guid.ToString();
                 string body = "";
                 body += @"
 <html lang=""en"">

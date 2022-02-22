@@ -1,0 +1,27 @@
+﻿@model Donkey
+    <div class="FormContainer" style="color: white;">
+        <p id="text">@Model.Value</p> <br>
+        <p>Being redirected to Home in</p>
+        <p id="count"></p>
+    </div>
+
+@section Scripts {
+    <script>
+        var text = document.getElementById("text");
+        text.innerHTML = text.textContent;
+
+        var countField = document.getElementById("count");
+        var count = 5;
+        var url = '@Url.Action("Home", "Home")';
+        countField.textContent = "5";
+        var Timer = setInterval(function() {
+            if (count < 0) {
+                window.location.href = url;
+            } else {
+                countField.textContent = count;
+                count -= 1;
+            }
+
+        }, 1000);
+    </script>
+}

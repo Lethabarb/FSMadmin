@@ -5,6 +5,8 @@
         public int id { get; set; }
         public string discord { get; set; }
         public string battlenet { get; set; }
-        public ulong ulongId { get; set; }
+        public string prole { get; set; }
+        public Guid TeamId { get; set; }
+
     }
 }

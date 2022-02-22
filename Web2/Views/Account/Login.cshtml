@@ -1,0 +1,64 @@
+﻿@model User
+<div class="ErrorContainer" id="error">
+    <p class="Error"><strong>ERROR: </strong> User not found or invalid credentials, please try again</p>
+</div>
+<div id="pageloader">
+   <img src="http://cdnjs.cloudflare.com/ajax/libs/semantic-ui/0.16.1/images/loader-large.gif" alt="processing..." />
+</div>
+<div class="FormContainer" id="form">
+    <form class="LoginForm" action="LoginUser" class="AccountForm" method="post">
+        <div class="FormSection">
+            <input type="text" name="email" class="FormInput" placeholder="Email" />
+        </div>
+        <div class="FormSection">
+            <input type="password" name="password" class="FormInput" placeholder="Password"/>
+        </div>
+        <div class="FormSection">
+            <input type="submit" class="FormSubmit" />
+        </div>
+    </form>
+    <div class="forgotpass">
+        @Html.ActionLink("Forgot password?", "ForgotPassword", "Account")
+    </div>
+</div>
+
+@section Scripts {
+
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $("#form").on("submit", function(){
+                $("#pageloader").fadeIn();
+            });//submit
+        });//document ready
+        var form = document.getElementById("form");
+        var error = document.getElementById("error");
+        var submit = document.getElementById("FormSubmit")
+        function showError() {
+            form.style.margin = "0vh auto auto auto";
+            error.style.display = "block";
+            setTimeout(function () {
+                error.style.left = "20px";
+                setTimeout(function () {
+                    error.style.left = "-20px";
+                    setTimeout(function () {
+                        error.style.left = "20px";
+                        setTimeout(function () {
+                            error.style.left = "-20px";
+                            setTimeout(function () {
+                                error.style.left = "20px";
+                                setTimeout(function () {
+                                    error.style.left = "0px";
+                                }, 100);
+                            }, 100);
+                        }, 000);
+                    }, 100);
+                }, 100);
+            }, 100);
+        }
+        
+        if ('@Model.EmailAddress.Equals("Invalid")' == 'True') {
+            showError();
+        }
+
+    </script>
+}

@@ -1,0 +1,874 @@
+body {
+    margin: 0;
+    background-color: rgb(42, 43, 46);
+}
+
+p, h1, h2, h3, h4, h5, h6, a {
+    font-family: Arial, Helvetica, sans-serif, 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+ul, li {
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background-color: rgb(18, 18, 20);
+    box-shadow: rgb(0, 0, 0) 0 0 1vh 0;
+}
+
+textarea {
+    resize: vertical;
+}
+
+.NavBar {
+    display: inline-flex;
+    padding: 0 2vw 0 2vw;
+}
+
+.NavItem {
+    display: inline;
+    color: white;
+    padding: 1.5vh 3vw 1.5vh 3vw;
+    font-weight: bold;
+}
+
+    .NavItem > a {
+        color: white;
+        text-decoration: none;
+    }
+
+    .NavItem:hover {
+        cursor: pointer;
+    }
+
+.LoginBar {
+    float: right;
+}
+
+footer {
+    position: relative;
+    bottom: 0;
+    width: 100%;
+    background-color: rgb(23, 23, 26);
+}
+
+.footerGrid {
+    padding: 3vh 3vw 3vh 3vw;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+}
+
+.footerGridItem, .footerGridItem > a {
+    text-decoration: none;
+    text-align: center;
+    color: white;
+}
+
+.MyTeams {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: auto;
+    padding-left: 5vh;
+    padding-right: 5vh;
+    column-gap: 2vh;
+    row-gap: 2vh;
+}
+
+.Team {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 2fr 1fr 1fr 1fr 5fr;
+    height: 70vh;
+    background-color: rgb(14, 14, 15);
+    text-align: center;
+    padding: 1vh;
+    border-radius: 25px;
+}
+
+.TeamName {
+    font-size: xx-large;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.TeamRank {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-style: italic;
+}
+
+.TeamTable {
+    margin-bottom: 2vh;
+}
+
+.RoleIcon {
+    width: 25px;
+    height: 25px;
+    object-fit: cover;
+    display: inline;
+}
+
+.PlayerName {
+    display: inline;
+    font-size: 25px;
+}
+
+.TeamPlayer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.TeamLogo {
+    height: 10vh;
+    object-fit: cover;
+}
+
+.ImageCenter {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.TeamsTable {
+}
+
+.AddTeamContainer {
+    width: 80vw;
+    margin: 1vh 10vw 0 10vw;
+}
+
+.AddTeamButt {
+    color: rgb(136, 146, 0);
+    background-color: rgb(58, 58, 58);
+    border: none;
+    border-radius: 3px;
+    font-size: 20px;
+    width: 5vh;
+    height: 5vh;
+    margin: 0 37.5vw 0 37.5vw;
+}
+
+    .AddTeamButt:hover {
+        cursor: pointer;
+    }
+
+.ScrimsGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: auto;
+    padding: 5vh;
+}
+
+.Scrim {
+    margin: 1.5vh;
+    border-radius: 20px;
+    background-color: rgb(23, 23, 26);
+    max-width: 28vw;
+    height: 35vh;
+    padding: 2.5vh;
+    color: white;
+}
+
+.ScrimHeader {
+    display: grid;
+    grid-template-columns: 3fr 1fr 3fr;
+    border: solid rgb(0, 255, 255);
+    border-radius: 20px;
+    padding: 2vh;
+    text-align: center;
+    margin-bottom: 1vh;
+    height: 12vh;
+}
+
+.ScrimDetails {
+    height: 12vh;
+    text-align: center;
+    padding: 2vh;
+    border: solid rgb(0, 95, 95);
+    border-radius: 20px;
+    font-size: 20px;
+}
+
+.Team1 {
+    font-size: 20px;
+    color: rgb(206, 153, 255);
+    display: flex;
+    margin: auto 0 auto 0;
+}
+
+.Team2 {
+    font-size: 20px;
+    color: rgb(255, 153, 209);
+    display: flex;
+    margin: auto 0 auto 0;
+}
+
+.vs {
+    display: flex;
+    margin: auto auto auto auto;
+    font-size: 20px;
+    color: white;
+}
+
+.Date {
+    margin-bottom: 4.5vh;
+}
+
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: 5vh;
+    background-color: rgb(17, 17, 17);
+    color: white;
+    height: 100%;
+    width: 6vh;
+    z-index: 1;
+    overflow-x: hidden;
+    padding-top: 6vh;
+}
+
+.openbutton, .closebutton {
+    border: none;
+    color: white;
+    background-color: inherit;
+    font-size: 30px;
+    cursor: pointer;
+    width: 6vh;
+    height: 6vh;
+}
+
+.closebutton {
+    position: absolute;
+    top: 0px;
+    left: 12vw;
+}
+
+#main {
+    transition: margin-left 0.2s;
+}
+
+#sidebar {
+    transition: width 0.2s;
+}
+
+#footer {
+    transition: margin-left 0.2s;
+    transition: width 0.2s;
+}
+
+.sideitem {
+    padding: 1vh 2vh 1vh 2vh;
+    border-bottom: solid rgb(0, 26, 36);
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+    .sideitem:hover {
+        cursor: pointer;
+        background-color: rgb(26, 26, 26);
+    }
+
+    .sideitem > p {
+        white-space: nowrap;
+    }
+
+.FilterContainer {
+    width: 100%;
+    text-align: center;
+    margin: 5vh 0 0 0;
+}
+
+.DateFilter {
+    border: none;
+    background-color: rgb(26, 26, 26);
+    color: white;
+}
+
+.Calender {
+    margin: 4vh 8vw 15vh 8vw;
+    width: 84vw;
+    border-spacing: 1px;
+}
+
+    .Calender > tbody > tr > td {
+        width: 12vw;
+        height: 8vh;
+        padding: 2px 0 3px 0;
+    }
+
+.cellButt {
+    height: 100%;
+    width: 100%;
+    padding: 3vh 0 3vh 0;
+    border: none;
+    background-color: rgb(15, 15, 15);
+    color: rgb(0, 0, 0);
+    font-size: 25px;
+    font-weight: bold;
+    transition: color 0.2s;
+    margin-bottom: 0.5vh;
+}
+
+    .cellButt:hover {
+        color: rgb(255, 208, 0);
+        cursor: pointer;
+    }
+
+.calDate {
+    background-color: rgb(15, 15, 15);
+    color: white;
+    height: 4vh;
+}
+
+.outofmonth {
+    color: rgb(54, 54, 54)
+}
+
+.CellScrim {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    height: 100%;
+    width: 100%;
+    border: none;
+    background-color: rgb(15, 15, 15);
+    color: rgb(255, 255, 255);
+    font-size: 20px;
+    font-weight: bold;
+    transition: color 0.2s;
+    margin-bottom: 0.5vh;
+}
+
+    .CellScrim:hover {
+        color: rgb(0, 117, 117);
+        cursor: pointer;
+    }
+
+.AddScrim {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    padding: 2vh;
+    background-color: rgb(15, 15, 15);
+    border-radius: 20px;
+    max-width: 40vw;
+    max-height: 40vh;
+    display: none;
+    grid-template-rows: 1fr 2fr 1fr;
+    border: solid orange;
+}
+
+.AddScrimBlur {
+    position: fixed;
+    display: none;
+    top: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.267);
+    width: 100vw;
+    height: 100vh;
+    cursor: pointer;
+}
+
+.AddScrimTeams {
+    display: grid;
+    grid-template-columns: 3fr 1fr 3fr;
+    margin-bottom: 3vh;
+}
+
+.closepop {
+    display: inline;
+    width: 3vw;
+    margin-bottom: 0vh;
+    margin-left: 90%;
+    border: none;
+    color: rgb(65, 65, 65);
+    background-color: inherit;
+    font-size: 25px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+    .closepop:hover {
+        color: rgb(92, 92, 92);
+    }
+
+.AddTeamSelect {
+    padding: 10px;
+    border: none;
+    border-radius: 10px;
+    color: rgb(14, 14, 14);
+    width: 100%;
+    height: 7vh;
+    background-color: orange;
+    font-weight: bold;
+    font-size: 10px;
+}
+
+.AddScrimTime {
+    border: none;
+    border-radius: 10px;
+    color: rgb(14, 14, 14);
+    width: 30%;
+    background-color: orange;
+    font-weight: bold;
+    font-size: 18px;
+    margin-left: 35%;
+}
+
+.saveScrim {
+    border: none;
+    border-radius: 10px;
+    color: rgb(255, 153, 0);
+    width: 100%;
+    height: 7vh;
+    background-color: rgb(26, 26, 26);
+    margin-top: 2vh;
+    font-weight: bold;
+    font-size: 20px;
+    transition: border 0.2s;
+    border: solid rgb(26, 26, 26);
+}
+
+    .saveScrim:hover {
+        border: solid orange;
+        cursor: pointer;
+    }
+
+.ViewScrim {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    padding: 2vh;
+    background-color: rgb(15, 15, 15);
+    border-radius: 20px;
+    max-width: 40vw;
+    max-height: 40vh;
+    display: none;
+    grid-template-rows: 2fr 1fr;
+    border: solid rgb(0, 225, 255);
+}
+
+.ViewScrimTeams {
+    display: grid;
+    grid-template-columns: 3fr 1fr 3fr;
+    margin-bottom: 3vh;
+}
+
+.ViewTeam {
+    padding: 10px;
+    display: block;
+    border: none;
+    border-radius: 10px;
+    color: rgb(14, 14, 14);
+    width: 90%;
+    height: 7vh;
+    background-color: rgb(0, 238, 255);
+    font-weight: bold;
+    font-size: 15px;
+    text-align: center;
+}
+
+.ViewScrimTime {
+    text-align: center;
+    border: solid rgb(0, 238, 255);
+    border-radius: 10px;
+    color: rgb(0, 238, 255);
+    width: 50%;
+    background-color: rgb(15, 15, 15);
+    font-weight: bold;
+    font-size: 18px;
+    margin-left: 25%;
+}
+
+.editScrim {
+    border: none;
+    border-radius: 10px;
+    color: rgb(0, 238, 255);
+    width: 100%;
+    height: 7vh;
+    background-color: rgb(26, 26, 26);
+    margin-top: 2vh;
+    font-weight: bold;
+    font-size: 20px;
+    transition: border 0.2s;
+    border: solid rgb(26, 26, 26);
+}
+
+    .editScrim:hover {
+        border: solid rgb(0, 217, 255);
+        cursor: pointer;
+    }
+
+.FormContainer {
+    width: fit-content;
+    margin: 10vh auto 5vh auto;
+    text-align: center;
+    border-radius: 20px;
+    background-color: rgb(26, 26, 26);
+    padding: 3vh;
+}
+
+#OrgForm, #OrgDisplay {
+    width: 50vw;
+    height: fit-content;
+    text-align: left;
+}
+
+.FormSection {
+    display: block;
+    padding: 2vh;
+}
+
+.FormInput {
+    background-color: white;
+    height: 5vh;
+    color: rgb(31, 31, 31);
+    border: none;
+    border-radius: 5px;
+    font-size: 20px;
+}
+
+.FormDisplay {
+    background-color: inherit;
+    height: 5vh;
+    color: rgb(255, 255, 255);
+    border: none;
+    border-radius: 5px;
+    font-size: 40px;
+    display: inline-block;
+}
+
+.FormSubmit {
+    border: rgb(0, 255, 255) solid;
+    background-color: inherit;
+    color: rgb(0, 255, 255);
+    border-radius: 5px;
+    width: 100%;
+    height: 5vh;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+    .FormSubmit:hover {
+        cursor: pointer;
+        background-color: rgb(0, 48, 48);
+    }
+
+.forgotpass {
+    color: white;
+    font-size: 10px;
+    text-decoration: underline;
+}
+
+    .forgotpass:hover {
+        cursor: pointer;
+    }
+
+.ErrorContainer {
+    background-color: red;
+    border-radius: 10px;
+    width: 15vw;
+    margin: 10vh auto 2vh auto;
+    padding: 3vh;
+    display: none;
+    position: relative;
+    left: 0px;
+    transition: left 0.1s;
+}
+
+.Error {
+    color: white;
+    text-align: center;
+}
+
+.ImageUploadContainer {
+    max-width: 10vw;
+    position: relative;
+    display: inline;
+    float: left;
+    text-align: center;
+    height: fit-content;
+    color: white;
+}
+
+.OrgFrame {
+    overflow: hidden;
+    width: 10vw;
+    height: 10vw;
+    display: inline-block;
+    background-size: cover;
+    background-image: url("");
+    background-color: rgb(0, 0, 0);
+    border-radius: 5vw;
+}
+
+.OrgDisplayFrame {
+    overflow: hidden;
+    width: 10vw;
+    height: 10vw;
+    display: inline-block;
+    background-size: cover;
+    background-image: url("OrgImages/");
+    background-color: rgb(0, 0, 0);
+    border-radius: 5vw;
+}
+
+.OrgFrame::before {
+    content: 'click to change';
+    position: relative;
+    top: 4.5vw;
+    left: 0vh;
+    font-weight: bold;
+    font-family: Arial, Helvetica, sans-serif;
+    text-shadow: rgb(0, 0, 0) 1px 0 10px;
+}
+
+.FormInputImage {
+    opacity: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    height: 100%;
+    width: 100%;
+}
+
+#OrgName {
+    margin: 3vh 0 2vh 2vw;
+    width: 70%;
+}
+
+#OrgShort {
+    margin: 0 0 0 2vw;
+    font-size: smaller;
+    height: 3vh;
+    width: 50%;
+}
+
+#FormSubmit {
+    margin-top: 2vh;
+}
+
+.OrgHeader {
+    background-color: rgb(18, 18, 20);
+    border-top: rgb(44, 44, 44) solid;
+    border-bottom: rgb(0, 255, 255) solid;
+    font-size: 20px;
+    position: sticky;
+    top: 5vh;
+    width: 100%;
+    transition: 100ms;
+    z-index: 5;
+}
+
+.OrgHeaderTitle {
+    color: rgb(30, 32, 32);
+    background-color: rgb(0, 255, 255);
+    display: inline-block;
+    padding: 3vh;
+    margin-right: 3vw;
+    font-weight: bold;
+}
+
+.OrgHeader > ul {
+    display: inline;
+}
+
+    .OrgHeader > ul > li {
+        display: inline-block;
+        width: 10vw;
+        text-align: center;
+    }
+
+.OrgHeadItem {
+    color: white;
+    background-size: 200% 200%;
+    padding: 3vh;
+    text-decoration: none;
+    font-weight: bold;
+    display: block;
+    background-image: linear-gradient(to top,rgb(0, 255, 255) 50%, rgb(18, 18, 20) 0);
+    background-position: top;
+    transition: background-position 0.5s, color 0.5s;
+}
+
+    .OrgHeadItem:hover {
+        background-position: bottom;
+        color: rgb(30, 32, 32);
+        cursor: pointer;
+    }
+
+.OrgHeadSelect {
+    background-position: bottom;
+    color: rgb(30, 32, 32);
+}
+
+.ImageMargin {
+    margin-bottom: 6vh;
+}
+
+.Section {
+    display: block;
+    width: 100%;
+    background-color: rgb(22, 22, 22);
+    height: fit-content;
+    margin-top: 5vh;
+    margin-bottom: 5vh;
+    color: white;
+    text-align: center;
+}
+
+    .Section > h1 {
+        padding: 3vh;
+    }
+
+#TitleSection {
+    background-color: rgb(0, 255, 255);
+    text-align: center;
+    color: rgb(46, 46, 46);
+    font-size: 50px;
+}
+
+#TitleSectionsml {
+    background-color: rgb(0, 255, 255);
+    text-align: center;
+    color: rgb(46, 46, 46);
+    font-size: 25px;
+    margin-top: 3vh;
+}
+
+.FormLabel {
+    color: white;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 20px;
+    margin-right: 1vw;
+    width: 8vw;
+    display: inline-block;
+}
+
+.BotConfig {
+    margin-right: 1vw;
+    display: inline-block;
+    padding: 1vh 1vh 1vh 1vh;
+    height: fit-content;
+}
+
+#BotForm {
+    margin-top: 1vh;
+    width: 50vw;
+    height: fit-content;
+    text-align: center;
+}
+
+.SectionTitle {
+    display: block;
+    padding: 2vh;
+    text-align: center;
+    color: white;
+}
+
+    .SectionTitle > h1 {
+        display: inline-block;
+        margin-right: 1vw;
+    }
+
+    .SectionTitle > .FormSubmit {
+        display: inline;
+        font-weight: normal;
+        text-decoration: none;
+        border: rgb(0, 255, 255) solid 0.5px;
+        padding: 1vh;
+        font-size: 25px;
+    }
+
+.remove {
+    border: none;
+    border-radius: 20px;
+    background-color: rgb(230, 16, 16);
+    color: white;
+    font-weight: bold;
+    font-size: 15px;
+    display: inline;
+    width: 5vh;
+    height: 3vh;
+}
+
+    .remove:hover {
+        cursor: pointer;
+    }
+
+#pageloader {
+    display: none;
+    position: fixed;
+    top: 45%;
+    left: 45%;
+    width: 10%;
+    height: 10%;
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 20px;
+}
+
+svg {
+    background-color: transparent;
+    width: 100%;
+    height: 100%;
+}
+
+    svg path,
+    svg rect {
+        fill: #00f7ff;
+    }
+
+.ConfigTable {
+    margin: 0 auto 0 auto;
+}
+
+    .ConfigTable > tbody > tr > td {
+        padding-bottom: 2vh;
+    }
+.ConfigGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    row-gap: 2vh;
+    column-gap: 2vh;
+    text-align: left;
+
+}
+.TeamEdit {
+    background-color: #00f7ff;
+    border: none;
+    font-size: 15px;
+    font-weight: bold;
+    border-radius: 15px;
+    padding: 1vh 3vh 1vh 3vh;
+    text-decoration: none;
+    color: rgb(18, 18, 20);
+    transition: border-radius 0.5s;
+}
+
+    .TeamEdit:hover {
+        cursor: pointer;
+        border-radius: 5px;
+    }
+
+.newButt {
+    background-color: inherit;
+    color: rgb(0, 255, 255);
+    border-radius: 5px;
+    width: 100%;
+    height: 5vh;
+    font-size: 15px;
+    font-weight: bold;
+    text-decoration: none;
+}

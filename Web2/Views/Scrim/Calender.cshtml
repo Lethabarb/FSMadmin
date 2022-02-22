@@ -1,0 +1,214 @@
+﻿@using Web2.Helpers
+@model Scrim
+@inject UserHelper UserManager
+<table class="Calender">
+    @{
+        int numOfDays = DateTime.DaysInMonth(DateTime.Today.Year, DateTime.Today.Month);
+        int PrevMonthDays = 0;
+        if (DateTime.Today.Month != 1)
+        {
+            PrevMonthDays = DateTime.DaysInMonth(DateTime.Today.Year, DateTime.Today.Month - 1);
+        } else
+        {
+            PrevMonthDays = DateTime.DaysInMonth(DateTime.Today.Year - 1, 12);
+        }
+        //    1   |    2    |     3     |     4    |   5    |     6    |   0
+        //    0   |    1    |     2     |     3    |   4    |     5    |   6
+        // monday | tuesday | wednesday | thursday | friday | saturday | sunday
+        int StartDay = (int)new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1).DayOfWeek;
+        StartDay -= 1;
+        if (StartDay < 0) StartDay = 6;
+        int numOfWeeks = 1;
+        for (int i = numOfDays; i > 7-StartDay; i-=7)
+        {
+            numOfWeeks++;
+        }
+
+    }
+    @for (int i = 0; i < numOfWeeks; i++)
+    {
+        @if (i == 0)
+        {
+            <tr>
+                @for (int j = 0; j < 7; j++)
+                {
+                    if (j < StartDay)
+                    {
+                        int day = PrevMonthDays - j;
+                        <th class="outofmonth calDate">@day</th>
+                    } else
+                    {
+                        int day = j - StartDay + 1;
+                        
+                        <th class="calDate">@day</th>
+                    }
+                }
+            </tr>
+            <tr>
+                @for (int j = 0; j < 7; j++)
+                {
+                    bool scrim = false;
+                    int day = j - StartDay + 1;
+                    Scrim Scrim = new();
+                    foreach (Scrim s in Model.scrims)
+                    {
+                        if (DateTime.Today.Year == s.datetime.Year && DateTime.Today.Month == s.datetime.Month && day == s.datetime.Day)
+                        {
+                            scrim = true;
+                            Scrim = s;
+                        }
+                    }
+                    if (scrim)
+                    {
+                       <td>@Html.ActionLink("Scrim", "EditScrim", "Scrim", new {day = day}, new {@class = "CellScrim"})</td>
+                    } else
+                    {
+                        <td><input type="button" class="cellButt" value="+" onclick="openAddPopup(@day)"></td>
+                    }
+                    
+                }
+            </tr>
+        } else if (i == numOfWeeks - 1)
+        {
+            <tr>
+                @for (int j = i * 7 - StartDay + 1; j < i * 7 - StartDay + 8; j++)
+                {
+                    if (j <= numOfDays)
+                    {
+                        <th class="calDate">@j</th>
+                    } else
+                    {
+                        int day = j - numOfDays;
+                        <th class="calDate outofmonth">@day</th>
+                    }
+
+                }
+            </tr>
+            <tr>
+                @for (int j = i * 7 - StartDay + 1; j < i * 7 - StartDay + 8; j++)
+                {
+                    bool scrim = false;
+                    int day = j;
+                    Scrim Scrim = new();
+                    foreach (Scrim s in Model.scrims)
+                    {
+                        if (DateTime.Today.Year == s.datetime.Year && DateTime.Today.Month == s.datetime.Month && day == s.datetime.Day)
+                        {
+                            scrim = true;
+                            Scrim = s;
+                        }
+                    }
+                    if (scrim)
+                    {
+                        <td>@Html.ActionLink("Scrim", "EditScrim", "Scrim", new {day = day}, new {@class = "CellScrim"})</td>
+                        
+                    } else
+                    {
+                        <td><input type="button" class="cellButt" value="+" onclick="openAddPopup(@day)"></td>
+                    }
+                }
+            </tr>
+        } else
+        {
+            <tr>
+                @for (int j = 0; j < 7; j++)
+                {
+                    int day = i * 7 + j - StartDay + 1;
+                    <th class="calDate">@day</th>
+                }
+            </tr>
+            <tr>
+                @for (int j = 0; j < 7; j++)
+                {
+                    bool scrim = false;
+                    int day = i * 7 + j - StartDay + 1;
+                    Scrim Scrim = new();
+                    foreach (Scrim s in Model.scrims)
+                    {
+                        if (DateTime.Today.Year == s.datetime.Year && DateTime.Today.Month == s.datetime.Month && day == s.datetime.Day)
+                        {
+                            scrim = true;
+                            Scrim = s;
+                        }
+                    }
+                    if (scrim)
+                    {
+                       <td>@Html.ActionLink("Scrim", "EditScrim", "Scrim", new {day = day}, new {@class = "CellScrim"})</td>
+                    } else
+                    {
+                        <td><input type="button" class="cellButt" value="+" onclick="openAddPopup(@day)"></td>
+                    }
+                }
+            </tr>
+        }
+    }
+</table>
+
+
+<span class="AddScrimBlur" id="ScrimBlur" onclick="closePopup()"></span>
+<div class="AddScrim" id="AddScrim">
+    @Html.BeginForm("ScrimCreate","Scrim",null,FormMethod.Post,null, null) {
+    <input type="button" class="closepop" onclick="closePopup()" value="&times;">
+    <div class="AddScrimTeams">
+        @Html.DropDownListFor(s => s.Team1, new SelectList(Model.teams.Where(t => t.organisationId == UserManager.GetOrganisation().GetAwaiter().GetResult().id), "id", "name"), "Your Team", new {@class = "FormInput", name = "Team1"})
+        <p class="vs">vs</p>
+    @Html.DropDownListFor(s => s.Team2, new SelectList(Model.teams, "id", "name"), "Their Team", new {@class = "FormInput", name = "Team2"})
+    </div>
+    <input type="datetime-local" asp-for="datetime" name="datetime" class="AddScrimTime" id="AddScrimTime">
+    <input type="submit" class="saveScrim" id="saveScrim" value="save">
+    }
+</div>
+
+@section Scripts {
+    <script>
+        var timepopup = document.getElementById("AddScrimTime");
+        timepopup.value = "19:00"
+
+        var ClickedDate = document.getElementById("cell0101s");
+
+        var blur = document.getElementById("ScrimBlur");
+        function openAddPopup(day) {
+            var createtime = document.getElementById("AddScrimTime");
+            @{
+                string date = DateTime.Today.ToString("yyyy-MM");
+            }
+            var datestring = "@date" + "-" + day + "T19:00";
+            console.log(datestring);
+            createtime.value = datestring;
+            var popup = document.getElementById("AddScrim");
+            var x = event.screenX;
+            var y = event.screenY;
+
+            var lx = event.pageX;
+            var ly = event.pageY;
+            console.log("x:" + x);
+            console.log("y:" + y);
+            if (x > 780) {
+                lx -= 445;
+            }
+            if (y > 500) {
+                ly -= 150;
+            }
+            popup.style.display = "grid";
+            popup.style.left = lx + "px";
+            popup.style.top = ly + "px";
+            blur.style.display = "block";
+        }
+
+     
+        function closePopup() {
+            var popup = document.getElementById("AddScrim");
+            popup.style.display = "none";
+            popup.style.left = toString(0) + "vw";
+            popup.style.top = toString(0) + "vw";
+            blur.style.display = "none";
+        }
+
+        var saveButt = document.getElementById("saveScrim");
+        saveButt.addEventListener("click", () => {
+            ClickedDate.innerHTML = `
+            <input type="button" class="cellScrim" value="Scrim" onclick="openViewPopup(event)">`;
+            closePopup();
+        });
+    </script>
+}

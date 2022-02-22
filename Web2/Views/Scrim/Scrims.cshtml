@@ -1,0 +1,116 @@
+﻿@model ScrimList
+@section sidebar {
+<div class="sidebar" id="sidebar">
+    <input type="button" value="=" class="openbutton" id="openbutton" onclick="opensidebar()">
+    <input type="button" value="x" class="closebutton" id="closebutton" onclick="closesidebar()">
+    <ul id="sideitems" hidden=true>
+        @foreach (Team t in Model.teams)
+        {
+            <li class="sideitem">
+                @{
+                    string name = t.name;
+                    if (name.Length > 23) {
+                        name = name.Substring(0,20);
+                        name += "...";
+                    }
+                }
+                @Html.ActionLink(name,"Calender", "Scrim", new {id = @t.id})
+            </li>
+        }
+    </ul>
+</div>
+}
+
+
+<div class="FilterContainer">
+    <input type="date" class="DateFilter" id="datefilter">
+    @Html.ActionLink("new Scrim", "CreateScrim", "Scrim", null, new {@class = "newButt"})
+     | 
+    @Html.ActionLink("Send Reminders", "ScrimReminder", "Scrim", new {raction = "Scrims", controller = "Scrim"}, new {@class = "newButt"})
+</div>
+<div class="ScrimsGrid" id="scrimgrid">
+    @foreach (Scrim s in Model.scrims)
+    {
+        <div class="Scrim">
+            <div class="ScrimHeader">
+            <p class="Team1">@Model.teams.Where(t => t.id == s.Team1).FirstOrDefault().name</p>
+            <p class="vs">vs</p>
+            <p class="Team2">@Model.teams.Where(t => t.id == s.Team2).FirstOrDefault().name</p>
+        </div>
+        <div class="ScrimDetails">
+            <p class="Date">@s.datetime.ToShortDateString()</p>
+                @{
+                    string tz = "";
+                    DateTime DSstart = new DateTime(DateTime.Today.Year, 10, 3);
+                    DateTime DSend = new DateTime(DateTime.Today.Year, 4, 3);
+                    if (s.datetime > DSend && s.datetime < DSstart)
+                    {
+                        tz = "AEST";
+                    } else
+                    {
+                        tz = "AEDT";
+                    }
+                }
+            <p class="Time">@s.datetime.ToShortTimeString() @tz</p>
+        </div>
+        </div>
+    }
+
+</div>
+@section Scripts {
+    <script>
+            function opensidebar() {
+        console.log("hi open");
+        var sidelist = document.getElementById("sideitems");
+        var sidebar = document.getElementById("sidebar");
+        var main = document.getElementById("main");
+        var openbutton = document.getElementById("openbutton");
+        var closebutton = document.getElementById("closebutton");
+        var scrimgrid = document.getElementById("scrimgrid");
+        sidebar.style.paddingTop = "6vh";
+        sidebar.style.width = "15vw"
+        main.style.marginLeft = "15vw";
+        scrimgrid.style.gridTemplateColumns = "1fr 1fr"
+        openbutton.style.display = "none";
+        closebutton.style.display = "block";
+        sidelist.style.display = "block";
+    }
+    function closesidebar() {
+        console.log("hi close");
+        var sidelist = document.getElementById("sideitems");
+        var sidebar = document.getElementById("sidebar");
+        var main = document.getElementById("main");
+        var openbutton = document.getElementById("openbutton");
+        var closebutton = document.getElementById("closebutton");
+        var scrimgrid = document.getElementById("scrimgrid");
+        sidebar.style.paddingTop = "0vh";
+        sidebar.style.width = "6vh";
+        main.style.marginLeft = "6vh";
+        scrimgrid.style.gridTemplateColumns = "1fr 1fr 1fr"
+        openbutton.style.display = "block";
+        closebutton.style.display = "none";
+        sidelist.style.display = "none";
+    }
+        closesidebar();
+        var datefilter = document.getElementById("datefilter");
+        var D = new Date();
+        datefilter.value = "@DateTime.Today.ToString("yyyy-MM-dd")";
+        var sidebar = document.getElementById("sidebar");
+
+        var ScrollPos = 0;
+
+        document.addEventListener('scroll', function (e) {
+        console.log(document.body.scrollTop);
+        if (document.body.scrollTop >= 50 || document.documentElement.scrollTop > 50) {
+            sidebar.style.top = "0vh";
+        } else {
+            var sub = document.body.scrollTop;
+            if (sub > 50) {
+                sub = 50;
+            }
+            var top = 50-sub;
+            sidebar.style.top = top.toString();
+        }
+        });
+    </script>
+}

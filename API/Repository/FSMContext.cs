@@ -12,7 +12,8 @@ namespace API.Repository
         public DbSet<Team> team { get; set; }
         public DbSet<User> user { get; set; }
         public DbSet<AccountRecovery> accountrecovery { get; set; }
-
+        public DbSet<Login> logins { get; set; }
+        public DbSet<OrganisationUsers> organisationusers { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             var configuration = new ConfigurationBuilder()

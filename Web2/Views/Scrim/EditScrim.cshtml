@@ -1,0 +1,19 @@
+﻿@using Web2.Helpers
+@model Scrim
+@inject UserHelper UserManager
+<div class="FormContainer">
+    @using (Html.BeginForm("ScrimEdit","Scrim",FormMethod.Post,new {@class = "OrgForm", id="ScrimForm", autocomplete = "off", enctype = "multipart/form-data"}))
+    {
+        <input asp-for="id" name="id" hidden>
+        <div class="FormSection">
+            @Html.DropDownListFor(s => s.Team1, new SelectList(Model.teams.Where(t => t.organisationId == UserManager.GetOrganisation().GetAwaiter().GetResult().id), "id", "name"), "Your Team", new {@class = "FormInput", name = "Team1"})
+        </div>
+        <div class="FormSection">
+            @Html.DropDownListFor(s => s.Team2, new SelectList(Model.teams, "id", "name"), "Their Team", new {@class = "FormInput", name = "Team2"})
+        </div>
+        <div class="FormSection">
+            <input asp-for="datetime" name="datetime" class="FormInput">
+        </div>
+        <input type="submit" class="FormSubmit"/>
+    }
+</div>

@@ -1,0 +1,22 @@
+﻿@using Web2.Helpers
+@inject UserHelper UserManager
+
+@if (UserManager.isSignedIn()) {
+    <ul class="NavBar LoginBar">
+    <li class="NavItem">
+        @Html.ActionLink("MyOrg", "Index", "Organisation")
+    </li>
+    <li class="NavItem">
+        @Html.ActionLink("Logout", "Logout", "Account")
+    </li>
+</ul>
+} else {
+<ul class="NavBar LoginBar">
+    <li class="NavItem">
+        @Html.ActionLink("Login", "Login", "Account")
+    </li>
+    <li class="NavItem">
+        @Html.ActionLink("Regrister", "Regrister", "Account")
+    </li>
+</ul>
+}

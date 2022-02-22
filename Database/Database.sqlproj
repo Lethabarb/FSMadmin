@@ -69,6 +69,8 @@
     <Build Include="dbo\Tables\Team.sql" />
     <Build Include="dbo\Tables\User.sql" />
     <Build Include="dbo\Tables\AccountRecovery.sql" />
+    <Build Include="dbo\Tables\Logins.sql" />
+    <Build Include="dbo\Tables\OrganisationUsers.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="Database.refactorlog" />

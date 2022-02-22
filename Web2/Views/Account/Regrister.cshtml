@@ -1,0 +1,33 @@
+﻿@model User
+
+<div class="FormContainer">
+    <form class="LoginForm" action="RegristerUser" class="AccountForm" id="form">
+        <div class="FormSection">
+            <input type="text" name="email" class="FormInput" placeholder="Email" />
+        </div>
+        <div class="FormSection">
+            <input type="text" name="username" class="FormInput" placeholder="Username" />
+        </div>
+        <div class="FormSection">
+            <input type="password" name="password" class="FormInput" placeholder="Password"/>
+        </div>
+        <div class="FormSection">
+            <input type="password" name="confpassword" class="FormInput" placeholder="Confirm Password"/>
+        </div>
+        <div class="FormSection">
+            <input type="submit" class="FormSubmit" />
+        </div>
+    </form>
+    <div class="forgotpass">
+        <a>Forgot Password?</a>
+    </div>
+</div>
+@section Scripts {
+    <script>
+                $(document).ready(function(){
+            $("#form").on("submit", function(){
+                $("#pageloader").fadeIn();
+            });//submit
+        });//document ready
+    </script>
+}

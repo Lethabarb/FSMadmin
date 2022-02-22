@@ -1,0 +1,6 @@
+﻿CREATE TABLE [dbo].[OrganisationUsers]
+(
+	[Id] INT NOT NULL PRIMARY KEY IDENTITY(1,1), 
+    [OrgId] UNIQUEIDENTIFIER NOT NULL, 
+    [UserId] INT NOT NULL
+)

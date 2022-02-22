@@ -1,0 +1,173 @@
+﻿@inject Web2.Helpers.UserHelper userManager
+@model Team
+<div class="FormContainer" id="Orgform">
+    @using (Html.BeginForm("TeamEdit","Team",FormMethod.Post,new {@class = "OrgForm", id="OrgForm", autocomplete = "off", enctype = "multipart/form-data"}))
+    {
+        <input asp-for="id" name="id" hidden>
+        <input name="oldplayers" id="oldplayers" type="text" value="@Newtonsoft.Json.JsonConvert.SerializeObject(@Model.players)" hidden>
+        <input name="oldname" type="text" value="@Model.name" hidden>
+        <div class="ImageMargin FormSection">
+            <div class="ImageUploadContainer">
+                <div class="OrgFrame" id="teamFrame"></div>
+                <input id="image" type="file" name="file" accept="image/*" class="FormInputImage">
+             </div>
+            <input asp-for="name" id="OrgName" name="name" class="FormInput" placeholder="Name" />
+        </div>
+        
+        <div class="FormSection">
+            <label class="FormLabel">Captain</label>
+            <input asp-for="captain" name="captain" class="FormInput" placeholder="DiscordCaptainId">
+        </div>
+        
+        <div class="FormSection">
+            <label class="FormLabel">Rank</label>
+            <input asp-for="rank" name="rank" class="FormInput" placeholder="TeamRank">
+        </div>
+        
+        <div class="FormSection">
+            <label class="FormLabel">TimeTableId</label>
+            <input name="TimeTable" class="FormInput" placeholder="TeamRank" value="@userManager.GetOrganisation().GetAwaiter().GetResult().Config.Teams.Where(t => t.Name == Model.name).FirstOrDefault().TimetableId">
+        </div>
+        <div class="Section">
+            <h3>Players</h3>
+        </div>
+        <div id="playerList">
+            @{int i = 0;}
+            @foreach (Player p in Model.players)
+            {
+            <div class="FormSection">
+                <input type="text" placeholder="Discord" value="@p.discord" id="Discord" class="FormInput BotConfig">
+                <input type="text" placeholder="BattleNet" value="@p.battlenet" id="BattleNet" class="FormInput BotConfig">
+                <select id="Role" class="FormInput BotConfig">
+                    <option>
+                        Tank
+                    </option>
+                    <option>
+                        DPS
+                    </option>
+                    <option>
+                        Support
+                    </option>
+                    <option>
+                        Flex
+                    </option>
+                </select>
+                    @if (i > 0)
+                    {
+                        <input type="button" class="remove" value="x" onclick="removePlayer(this)">
+                    }
+                    @{i++;}
+                </div>
+            }
+            
+        </div>
+        <input type="button" value="add player" class="FormSubmit" id="AddPlayer">
+        <input type="text" name="Players" id="Players" hidden>
+        <div class="FormSection">
+            <input type="submit" id="FormSubmit" class="FormSubmit" onclick="formsubmit()" />
+        </div>
+        @Html.ActionLink("Delete", "TeamDelete", "Team", new {id = Model.id}, new {@class = "remove"})
+    }
+</div>
+@section Scripts {
+    <script type="text/javascript">
+        var frame = document.getElementById("teamFrame");
+        var players = document.getElementById("Players");
+        var addPlayer = document.getElementById("AddPlayer");
+        var FormSubmit = document.getElementById("FormSubmit");
+        var PlayerList = document.getElementById("playerList");
+
+        
+        console.log(frame);
+        const file = document.getElementById("image");
+        const reader = new FileReader();
+        @{
+            string ImagePath = $"/TeamImages/{@Model.ImageName}";
+        }
+        frame.style.backgroundImage = "url('@ImagePath')";
+        console.log(frame);
+        var oldplayers = document.getElementById("oldplayers");
+        oldplayers = JSON.parse(oldplayers.value);
+        for (let i in oldplayers) {
+            var PlayerListElements = PlayerList.getElementsByClassName("FormSection");
+            for (var j = 0; j < PlayerListElements.length; j++) {
+                var Discord = PlayerListElements.item(i).querySelector("#Discord");
+                var BattleNet = PlayerListElements.item(i).querySelector("#BattleNet");
+                var Role = PlayerListElements.item(i).querySelector("#Role");
+                if (Discord.value == oldplayers[j].discord) {
+                    Role.value = oldplayers[j].prole;
+                }
+            }
+        }
+
+
+        reader.addEventListener("load", function () {
+            frame.style.backgroundImage = `url(${reader.result})`;
+        }, false);
+
+        file.addEventListener('change', function () {
+            const image = this.files[0];
+            var size = ((image.size/1024)/1024).toFixed(4);
+            if (size > 2) {
+                this.value = "";
+                showError();
+            }
+            if (image) reader.readAsDataURL(image);
+        }, false)
+
+        addPlayer.onclick = function () {
+            var newChild = document.createElement('div');
+            newChild.classList.add("FormSection");
+            newChild.innerHTML =   `
+                <input type="text" placeholder="Discord" id="Discord" class="FormInput BotConfig">
+                <input type="text" placeholder="BattleNet" id="BattleNet" class="FormInput BotConfig">
+                <select id="Role" class="FormInput BotConfig">
+                    <option>
+                        Tank
+                    </option>
+                    <option>
+                        DPS
+                    </option>
+                    <option>
+                        Support
+                    </option>
+                    <option>
+                        Flex
+                    </option>
+                </select>
+                <input type="button" class="remove" value="x" onclick="removePlayer(this)">
+                `;
+                PlayerList.appendChild(newChild);
+        }
+        function formsubmit() {
+            var PlayerListElements = PlayerList.getElementsByClassName("FormSection");
+            console.log(PlayerListElements)
+            var str = "[";
+            var first = true;
+            for (var i = 0; i < PlayerListElements.length; i++) {
+                if (!first) {
+                    str += ",";
+                } else {
+                    first = false;
+                }
+                str += "{"
+                var Discord = PlayerListElements.item(i).querySelector("#Discord");
+                var BattleNet = PlayerListElements.item(i).querySelector("#BattleNet");
+                var Role = PlayerListElements.item(i).querySelector("#Role");
+                str += '"Discord" : "' + Discord.value + '",';
+                str += '"battlenet" : "' + BattleNet.value + '",';
+                str += '"prole" : "' + Role.value + '"}';
+            }
+            str += "]";
+            players.value = str;
+            return true;
+        }
+
+        function removePlayer(e) {
+            console.log("hi");
+            var parent = e.parentElement;
+            console.log(parent);
+            PlayerList.removeChild(parent);
+        };
+    </script>
+}
