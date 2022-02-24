@@ -28,6 +28,7 @@
                 <input asp-for="shortName" id="OrgShort" name="OrgShort" class="FormInput SmallInput"
                      placeholder="Abbreviation" />
         </div>
+        <input asp-for="botConfig" value="@Model.botConfig" name="botConfig" hidden />
         <div class="FormSection">
             <input type="submit" id="OrgSave" class="FormSubmit" value="Save" />
         </div>
@@ -121,20 +122,22 @@
 <div>
 
     <h1 id="TitleSection">Bot Configuration</h1>
+    @Html.BeginForm("UpdateConfig", "Organisation",null,FormMethod.Post,false,null) {
     <div id="BotForm" class="FormContainer">
+        <div class="FormSection">
+            <div class="ConfigGrid">
+                <label class="FormLabel">Guild ID</label>
+                <label class="FormLabel">Bot Channel ID</label>
+                <input class="FormInput" id="configGuild" placeholder="Guild ID" value="@Model.Config.GuildId">
+                <input class="FormInput" id="configChannel" placeholder="Bot Channel" value="@Model.Config.BotChannel">
+                
+            </div>
+        </div>
         @if (@Model.teams.Count() < 1)
         {
             <h1 class="SectionTitle">You have no Teams</h1>
         } else {
-                <div class="FormSection">
-                    <div class="ConfigGrid">
-                        <label class="FormLabel">Guild ID</label>
-                        <label class="FormLabel">Bot Channel ID</label>
-                        <input class="FormInput" placeholder="Guild ID" value="@Model.Config.GuildId">
-                        <input class="FormInput" placeholder="Bot Channel" value="@Model.Config.BotChannel">
-                    </div>
-                </div>
-                <table class="ConfigTable">
+                <table class="ConfigTable" id="configTable">
                     <tbody>
                         <tr>
                             <th></th>
@@ -164,9 +167,11 @@
 
         }
         <div class="FormSection">
-            <input type="submit" id="OrgSave" class="FormSubmit" value="Save" />
+            <input type="text" name="config" id="submitConfig" hidden />
+            <input type="submit" id="OrgConfigSave" class="FormSubmit" value="Save" />
         </div>
     </div>
+    }
 </div>
 
 @section Scripts {
@@ -185,6 +190,7 @@
     var OrgDisplay = document.getElementById("OrgDisplay");
     var edit = document.getElementById("OrgEdit");
     var save = document.getElementById("OrgSave");
+    var Configsave = document.getElementById("OrgConfigSave");
     var OrgHeader = document.getElementById("OrgHeader");
     var OrgHead1 = document.getElementById("OrgHead1");
     var OrgHead2 = document.getElementById("OrgHead2");
@@ -198,6 +204,30 @@
     save.onclick = function () {
         OrgDisplay.style.display = "block";
         OrgForm.style.display = "none";
+    }
+
+    Configsave.onclick = function () {
+        var jsonarea = document.getElementById("submitConfig");
+        console.log(jsonarea);
+        var guild = document.getElementById("configGuild");
+        var channel = document.getElementById("configChannel");
+        var json = "{\"GuildId\":\"" + guild.value + "\", \"BotChannel\" : \"" + channel.value + "\", \"Teams\" : [";
+        if (@Model.teams.Count() > 0) {
+            var table = document.getElementById("configTable");
+            for (var i = 1, row; row = table.rows[i]; i++) {
+                var Name = row.cells[0].firstChild.value;
+                var capt = row.cells[1].firstChild.value;
+                var ttb = row.cells[2].firstChild.value;
+                json += "{\"Name\" : \"" + Name + "\", \"CaptainId\" : \"" + capt + "\", \"TimetableId\" : \"" + ttb + "\"}"
+                if (i != table.rows.length - 1) {
+                    json += ","
+                }
+            }
+        }
+        json += "]}"
+        jsonarea.value = json;
+        console.log(json);
+        return true;
     }
 
     var ScrollPos = 0;

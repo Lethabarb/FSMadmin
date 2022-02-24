@@ -34,13 +34,12 @@ namespace Web2.Controllers
 
         public async Task<IActionResult> OrganisationCreate(IFormFile file, string OrgName = "My Org", string OrgShort = "MO", ulong GuildId = 00000000000000000000, ulong ChannelId = 00000000000000000000)
         {
+            Api api = new();
             if (OrgName == null) OrgName = "My Org";
             if (OrgShort == null)
             {
                 OrgShort = String.Join(String.Empty, OrgName.Split(new[] { ' ' }).Select(word => word.First()));
             }
-            if (GuildId == null) GuildId = 00000000000000000000;
-            if (ChannelId == null) ChannelId = 00000000000000000000;
             Organisation org = new()
             {
                 name = OrgName,
@@ -67,10 +66,8 @@ namespace Web2.Controllers
                 {
                     await file.CopyToAsync(fileStream);
                 }
-                Api api = new();
-                var res = await api.CreateOrganisation(org, UserManager.GetUser());
-                
             }
+            var res = await api.CreateOrganisation(org, UserManager.GetUser());
             return View("~/Views/Home/Home.cshtml");
         }
         public async Task<IActionResult> MyOrganisation()
@@ -112,15 +109,14 @@ namespace Web2.Controllers
             }
             return View("MyOrganisation", org);
         }
-        public async Task<IActionResult> UpdateOrganisation(IFormFile file, string OrgName = "My Org", string OrgShort = "MO", ulong GuildId = 00000000000000000000, ulong ChannelId = 00000000000000000000)
+        public async Task<IActionResult> UpdateOrganisation(IFormFile file, string OrgName, string OrgShort, string botConfig)
         {
             if (OrgName == null) OrgName = "My Org";
             if (OrgShort == null)
             {
                 OrgShort = String.Join(String.Empty, OrgName.Split(new[] { ' ' }).Select(word => word.First()));
             }
-            if (GuildId == null) GuildId = 00000000000000000000;
-            if (ChannelId == null) ChannelId = 00000000000000000000;
+            BotConfig config = Newtonsoft.Json.JsonConvert.DeserializeObject<BotConfig>(botConfig);
             Api api = new();
             //Organisation Old = await UserManager.GetOrganisation();
             //System.IO.File.Delete($"./wwwroot/OrgImages/{Old.ImageName}");
@@ -128,13 +124,8 @@ namespace Web2.Controllers
             {
                 name = OrgName,
                 shortName = OrgShort,
-                guildId = GuildId,
-                botConfig = Newtonsoft.Json.JsonConvert.SerializeObject(new BotConfig()
-                {
-                    GuildId = GuildId,
-                    BotChannel = ChannelId,
-                    Teams = new List<TeamConfig>()
-                }),
+                guildId = config.GuildId,
+                botConfig = botConfig,
                 ImageName = "",
                 ImagePath = ""
             };
@@ -150,11 +141,20 @@ namespace Web2.Controllers
                 {
                     await file.CopyToAsync(fileStream);
                 }
-                var UserOrg = await UserManager.GetOrganisation();
-                var res = await api.UpdateOrganisation(org, UserOrg.id, UserManager.GetUser());
-                org = await UserManager.GetOrganisation();
             }
+            var UserOrg = await UserManager.GetOrganisation();
+            var res = await api.UpdateOrganisation(org, UserOrg.id, UserManager.GetUser());
+            org = await UserManager.GetOrganisation();
 
+            return View("MyOrganisation", org);
+        }
+        public async Task<IActionResult> UpdateConfig(string config)
+        {
+            Api api = new();
+            Organisation org = await UserManager.GetOrganisation();
+            org.botConfig = config;
+            var res = await api.UpdateOrganisation(org, org.id, UserManager.GetUser());
+            org = await UserManager.GetOrganisation();
             return View("MyOrganisation", org);
         }
     }

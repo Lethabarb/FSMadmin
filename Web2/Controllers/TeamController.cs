@@ -36,7 +36,7 @@ namespace Web2.Controllers
             Team team = new()
             {
                 id = TeamId,
-                name = org.shortName + " " + name,
+                name = $"[{org.shortName}] {name}",
                 captain = Captain,
                 organisationId = org.id,
                 rank = rank,
@@ -64,7 +64,7 @@ namespace Web2.Controllers
             {
                 CaptainId = Captain,
                 TimetableId = TimeTable,
-                Name = name
+                Name = $"[{org.shortName}] {name}"
             });
             org.botConfig = Newtonsoft.Json.JsonConvert.SerializeObject(oldConfig);
             await api.UpdateOrganisation(org, org.id, userManager.GetUser());
@@ -78,14 +78,11 @@ namespace Web2.Controllers
             return View("EditTeam", team);
 
         }
-        public async Task<IActionResult> TeamEdit(Guid id, string oldplayers, string oldname, IFormFile file, string name = "myTeam", ulong Captain = 00000000000000000000, int rank = 0, string Players = "[]", ulong TimeTable = 00000000000000000000)
+        public async Task<IActionResult> TeamEdit(Guid id, string oldplayers, string oldname, IFormFile file, string name, ulong Captain, int rank, string Players , ulong TimeTable)
         {
             Organisation org = await userManager.GetOrganisation();
-            if (name == null) name = org.shortName + " " + "myTeam";
-            if (Captain == null) Captain = 00000000000000000000;
-            if (rank == null) rank = 0;
+            if (name == null) name = $"[{org.shortName}] myTeam";
             if (Players == null) Players = "[]";
-            if (TimeTable == null) TimeTable = 00000000000000000000;
             List<Player> oldPlayers = Newtonsoft.Json.JsonConvert.DeserializeObject<List<Player>>(oldplayers);
             List<Player> players = Newtonsoft.Json.JsonConvert.DeserializeObject<List<Player>>(Players);
             Api api = new Api();
@@ -101,7 +98,7 @@ namespace Web2.Controllers
             Team team = new()
             {
                 id = id,
-                name = org.shortName + " " + name,
+                name = $"[{org.shortName}] {name}",
                 captain = Captain,
                 organisationId = org.id,
                 rank = rank,
@@ -128,7 +125,7 @@ namespace Web2.Controllers
             {
                 CaptainId = Captain,
                 TimetableId = TimeTable,
-                Name = name
+                Name = $"[{org.shortName}] {name}"
             });
             org.botConfig = Newtonsoft.Json.JsonConvert.SerializeObject(oldConfig);
             await api.UpdateOrganisation(org, org.id, userManager.GetUser());
