@@ -15,6 +15,9 @@
     </ul>
 
 </div>
+<div class="CenterDiv">
+    <input type="button" id="ShareButt" class="newButt" value="Share"/>
+</div>
 <div>
     <div id="OrgForm" class="FormContainer">
         @using(Html.BeginForm("UpdateOrganisation", "Organisation", FormMethod.Post,new {@class = "OrgForm", id="OrgForm", autocomplete = "off", enctype = "multipart/form-data"}))
@@ -122,7 +125,7 @@
 <div>
 
     <h1 id="TitleSection">Bot Configuration</h1>
-    @Html.BeginForm("UpdateConfig", "Organisation",null,FormMethod.Post,false,null) {
+    @using(Html.BeginForm("UpdateConfig", "Organisation",null,FormMethod.Post,false,null)) {
     <div id="BotForm" class="FormContainer">
         <div class="FormSection">
             <div class="ConfigGrid">
@@ -173,9 +176,27 @@
     </div>
     }
 </div>
+<span class="AddScrimBlur" id="modalBlur" onclick="closeModal()"></span>
+<div id="ShareModal" class="Modal">
+    <div class="FormContainer" id="ModalForm">
+    @using(Html.BeginForm("AddOrgUser", "Organisation",null))
+    {
+        <div class="FormSection">
+            <label class="FormLabel">User Email</label>
+            <input type="text" name="Email" />
+        </div>
+        <div class="FormSection">
+            <input type="submit" value="Share">
+        </div>
+    }
+    </div>
+</div>
 
 @section Scripts {
 <script>
+    
+    var ModalBack = document.getElementById("modalBlur");
+    var ModelButt = document.getElementById("ShareButt");
     var DisplayImage = document.getElementById("Displayframe");
     var InputImage = document.getElementById("frame");
     const file = document.getElementById('image');
@@ -203,7 +224,20 @@
     }
     save.onclick = function () {
         OrgDisplay.style.display = "block";
+        ModalBack.style.display = "block";
         OrgForm.style.display = "none";
+    }
+
+    ModelButt.onclick = function () {
+        var ShareModal = document.getElementById("ShareModal");
+        ShareModal.style.display = "block";
+        ModalBack.style.display = "block";
+    }
+    function closeModal() {
+        console.log("hi");
+        var ShareModal = document.getElementById("ShareModal");
+        ShareModal.style.display = "none";
+        ModalBack.style.display = "none";
     }
 
     Configsave.onclick = function () {
@@ -214,10 +248,11 @@
         var json = "{\"GuildId\":\"" + guild.value + "\", \"BotChannel\" : \"" + channel.value + "\", \"Teams\" : [";
         if (@Model.teams.Count() > 0) {
             var table = document.getElementById("configTable");
+            console.log(table);
             for (var i = 1, row; row = table.rows[i]; i++) {
-                var Name = row.cells[0].firstChild.value;
-                var capt = row.cells[1].firstChild.value;
-                var ttb = row.cells[2].firstChild.value;
+                var Name = row.cells[0].children[0].textContent;
+                var ttb = row.cells[1].children[0].value;
+                var capt = row.cells[2].children[0].value;
                 json += "{\"Name\" : \"" + Name + "\", \"CaptainId\" : \"" + capt + "\", \"TimetableId\" : \"" + ttb + "\"}"
                 if (i != table.rows.length - 1) {
                     json += ","
@@ -226,7 +261,6 @@
         }
         json += "]}"
         jsonarea.value = json;
-        console.log(json);
         return true;
     }
 

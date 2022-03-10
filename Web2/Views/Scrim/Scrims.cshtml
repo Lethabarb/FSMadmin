@@ -4,7 +4,7 @@
     <input type="button" value="=" class="openbutton" id="openbutton" onclick="opensidebar()">
     <input type="button" value="x" class="closebutton" id="closebutton" onclick="closesidebar()">
     <ul id="sideitems" hidden=true>
-        @foreach (Team t in Model.teams)
+        @foreach (Team t in Model.myTeams)
         {
             <li class="sideitem">
                 @{
@@ -27,6 +27,7 @@
     @Html.ActionLink("new Scrim", "CreateScrim", "Scrim", null, new {@class = "newButt"})
      | 
     @Html.ActionLink("Send Reminders", "ScrimReminder", "Scrim", new {raction = "Scrims", controller = "Scrim"}, new {@class = "newButt"})
+    @Html.ActionLink("Timetable", "UpdateTimetables", "Scrim", new {raction = "Scrims", controller = "Scrim"}, new {@class = "newButt"})
 </div>
 <div class="ScrimsGrid" id="scrimgrid">
     @foreach (Scrim s in Model.scrims)
@@ -53,6 +54,7 @@
                 }
             <p class="Time">@s.datetime.ToShortTimeString() @tz</p>
         </div>
+        @Html.ActionLink("edit","EditScrim2","Scrim",new {id = s.id}, new {@class = "newButt"})
         </div>
     }
 

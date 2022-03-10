@@ -10,5 +10,7 @@
         public string ImageName { get; set; }
         public string ImagePath { get; set; }
         public IEnumerable<Player> players { get; set; }
+        public string exception { get; set; }
+        public bool myTeam { get; set; }
     }
 }

@@ -12,6 +12,7 @@ namespace Web2.Controllers
     public class OrganisationController : Controller
     {
         private readonly UserHelper UserManager;
+        private readonly Api api = new Api();
         public OrganisationController(UserHelper userHelper)
         {
             UserManager = userHelper;
@@ -31,7 +32,13 @@ namespace Web2.Controllers
             };
             return View("CreateOrganisation");
         }
-
+        public async Task<IActionResult> AddOrgUser(string Email)
+        {
+            int user = await api.getUserId(Email);
+            Organisation org = await UserManager.GetOrganisation();
+            var res = await api.AddUsertoOrg(user, org.id, UserManager.GetUser());
+            return RedirectToAction("MyOrganisation");
+        }
         public async Task<IActionResult> OrganisationCreate(IFormFile file, string OrgName = "My Org", string OrgShort = "MO", ulong GuildId = 00000000000000000000, ulong ChannelId = 00000000000000000000)
         {
             Api api = new();
@@ -144,9 +151,8 @@ namespace Web2.Controllers
             }
             var UserOrg = await UserManager.GetOrganisation();
             var res = await api.UpdateOrganisation(org, UserOrg.id, UserManager.GetUser());
-            org = await UserManager.GetOrganisation();
 
-            return View("MyOrganisation", org);
+            return RedirectToAction("MyOrganisation");
         }
         public async Task<IActionResult> UpdateConfig(string config)
         {
@@ -155,7 +161,8 @@ namespace Web2.Controllers
             org.botConfig = config;
             var res = await api.UpdateOrganisation(org, org.id, UserManager.GetUser());
             org = await UserManager.GetOrganisation();
-            return View("MyOrganisation", org);
+            return RedirectToAction("MyOrganisation");
+
         }
     }
 }

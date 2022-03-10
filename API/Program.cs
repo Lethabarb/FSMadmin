@@ -123,6 +123,12 @@ app.MapPost("/login", (UserLogin user, IUserService service, [FromServices] FSMC
     }).Accepts<UserLogin>("application/json")
     .Produces<User>().AllowAnonymous();
 
+app.MapGet("/User/{email}", ([FromServices] FSMContext context, string email) =>
+{
+    var res = context.Set<User>().Where(u => u.EmailAddress == email).FirstOrDefault();
+    return res;
+});
+
 app.MapGet("/logins", ([FromServices] FSMContext context) =>
 {
     return context.Set<Login>().ToList();

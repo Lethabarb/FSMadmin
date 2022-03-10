@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Discord;
+using Microsoft.AspNetCore.Mvc;
 using Web2.Helpers;
 using Web2.Models;
 
@@ -8,26 +9,29 @@ namespace Web2.Controllers
     {
         private readonly UserHelper userManager;
         private readonly Api api = new();
-        public TeamController(UserHelper userHelper)
+        private readonly DiscordHelper discord;
+        public TeamController(UserHelper userHelper, DiscordHelper discord)
         {
             userManager = userHelper;
+            this.discord = discord;
         }
         public IActionResult CreateTeam()
         {
             return View("CreateTeam", new Team());
         }
 
-        public async Task<IActionResult> TeamCreate(IFormFile file, string name = "myTeam", ulong Captain = 00000000000000000000, int rank = 0, string Players = "[]", ulong TimeTable = 00000000000000000000)
+        public async Task<IActionResult> TeamCreate(IFormFile file, bool myTeam, string name, ulong Captain, int rank, string Players, ulong TimeTable)
         {
-            Organisation org = await userManager.GetOrganisation();
+            Api api = new Api();
+            Organisation org = new();
+            if (myTeam) org = await userManager.GetOrganisation();
+            if (!myTeam) org = await api.GetOrganisation(26);
+
             if (name == null) name = org.shortName + " " + "myTeam";
-            if (Captain == null) Captain = 00000000000000000000;
-            if (rank == null) rank = 0;
             if (Players == null) Players = "[]";
-            if (TimeTable == null) TimeTable = 00000000000000000000;
             List<Player> players = Newtonsoft.Json.JsonConvert.DeserializeObject<List<Player>>(Players);
             Guid TeamId = Guid.NewGuid();
-            Api api = new Api();
+            
             foreach (Player p in players)
             {
                 p.TeamId = TeamId;
@@ -57,6 +61,25 @@ namespace Web2.Controllers
                 }
                 
 
+            }
+            //check captain is in roster
+            if (myTeam)
+            {
+                IUser captain = await discord.getUser(Captain);
+                Player captainPlayer;
+                try
+                {
+                    captainPlayer = players.Find(p => p.discord == $"{captain.Username}#{captain.DiscriminatorValue.ToString().PadLeft(4, '0')}");
+                } catch
+                {
+                    team.exception = "captain discord is not in player list";
+                    return View("CreateTeam", team);
+                }
+                if (captainPlayer == null)
+                {
+                    team.exception = "captain discord is not in player list";
+                    return View("CreateTeam", team);
+                }
             }
             var res = await api.CreateTeam(team, userManager.GetUser());
             BotConfig oldConfig = Newtonsoft.Json.JsonConvert.DeserializeObject<BotConfig>(org.botConfig);
@@ -117,6 +140,13 @@ namespace Web2.Controllers
                 {
                     await file.CopyToAsync(fileStream);
                 }
+            }
+            IUser captain = await discord.getUser(Captain);
+            Player captainPlayer = players.Find(p => p.discord == $"{captain.Username}#{captain.DiscriminatorValue.ToString().PadLeft(4, '0')}");
+            if (captainPlayer == null)
+            {
+                team.exception = "captain discord is not in player list";
+                return View("EditTeam", team);
             }
             var res2 = await api.UpdateTeam(team, id, userManager.GetUser());
             BotConfig oldConfig = Newtonsoft.Json.JsonConvert.DeserializeObject<BotConfig>(org.botConfig);

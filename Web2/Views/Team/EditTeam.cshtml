@@ -1,5 +1,11 @@
 ﻿@inject Web2.Helpers.UserHelper userManager
 @model Team
+@if (Model.exception != null)
+{
+    <div class="ErrorContainer" id="error">
+    <p class="Error"><strong>ERROR: </strong> @Model.exception</p>
+</div>
+}
 <div class="FormContainer" id="Orgform">
     @using (Html.BeginForm("TeamEdit","Team",FormMethod.Post,new {@class = "OrgForm", id="OrgForm", autocomplete = "off", enctype = "multipart/form-data"}))
     {

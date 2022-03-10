@@ -24,7 +24,7 @@ namespace Web2.Helpers
             await client.LoginAsync(TokenType.Bot, configuration.GetValue<string>("DiscordBotToken"));
             await client.StartAsync();
             client.Ready += Ready;
-            await Task.Delay(5000);
+            await Task.Delay(1000);
         }
         private async Task Ready()
         {
@@ -48,7 +48,18 @@ namespace Web2.Helpers
         public async Task SendUserMessage(Embed message, ulong id)
         {
             var user = await client.GetUserAsync(id) as IUser;
-            await user.SendMessageAsync(null, false, message);
+            await user.SendMessageAsync("", false, message);
+        }
+        public async Task<IUser> getUser(ulong id)
+        {
+            var user = await client.GetUserAsync(id) as IUser;
+            return user;
+        }
+        public async Task deleteMessages(ulong id)
+        {
+            var channel = client.GetChannel(id) as ITextChannel;
+            var messages = await channel.GetMessagesAsync(100, CacheMode.AllowDownload).FlattenAsync();
+            await channel.DeleteMessagesAsync(messages);
         }
     }
 }

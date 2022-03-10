@@ -1,4 +1,10 @@
 ﻿@model Team
+@if (Model.exception != null)
+{
+    <div class="ErrorContainer" id="error">
+    <p class="Error"><strong>ERROR: </strong> @Model.exception</p>
+</div>
+}
 <div class="FormContainer" id="Orgform">
     @using (Html.BeginForm("TeamCreate","Team",FormMethod.Post,new {@class = "OrgForm", id="OrgForm", autocomplete = "off", enctype = "multipart/form-data"}))
     {
@@ -7,22 +13,22 @@
                 <div class="OrgFrame" id="frame"></div>
                 <input id="image" type="file" name="file" accept="image/*" class="FormInputImage">
              </div>
-            <input asp-for="name" id="OrgName" name="name" class="FormInput" placeholder="Name" />
+            *<input asp-for="name" id="OrgName" name="name" class="FormInput" placeholder="Name" />
         </div>
         
         <div class="FormSection">
-            <label class="FormLabel">Captain</label>
-            <input asp-for="captain" name="captain" class="FormInput" placeholder="DiscordCaptainId">
+            <label class="FormLabel">Captain*</label>
+            <input asp-for="captain" name="captain" id="captain" class="FormInput" placeholder="DiscordCaptainId">
         </div>
         
         <div class="FormSection">
-            <label class="FormLabel">Rank</label>
-            <input asp-for="rank" name="rank" class="FormInput" placeholder="TeamRank">
+            <label class="FormLabel">Rank*</label>
+            <input asp-for="rank" name="rank" id="rank" class="FormInput" placeholder="TeamRank" value=0>
         </div>
         
         <div class="FormSection">
-            <label class="FormLabel">TimeTableId</label>
-            <input name="TimeTable" class="FormInput" placeholder="TeamRank">
+            <label class="FormLabel">TimeTableId*</label>
+            <input name="TimeTable" id="timetable" class="FormInput" placeholder="TeamRank" value=0>
         </div>
         <div class="Section">
             <h3>Players</h3>
@@ -51,11 +57,21 @@
         <input type="button" value="add player" class="FormSubmit" id="AddPlayer">
         <input type="text" name="Players" id="Players" hidden>
         <div class="FormSection">
-            <input type="submit" id="FormSubmit" class="FormSubmit" onclick="formsubmit()" />
+            <label class="FormLabel">My Team?</label>
+            @Html.CheckBoxFor(m => m.myTeam,true)
+        </div>
+        <div class="FormSection">
+            <input type="submit" id="FormSubmit" class="FormSubmit" onclick="return formsubmit()" />
         </div>
     }
 </div>
 @section Scripts {
+    @if (Model.exception != null) {
+        <script>
+            var errordiv = document.getElementById("error");
+            errordiv.style.display = "block";
+        </script>
+    }
     <script type="text/javascript">
         var players = document.getElementById("Players");
         var addPlayer = document.getElementById("AddPlayer");
@@ -105,6 +121,16 @@
                 PlayerList.appendChild(newChild);
         }
         function formsubmit() {
+            //form validation
+            var name = document.getElementById("OrgName");
+            var rank = document.getElementById("timetable");
+            var timetable = document.getElementById("rank");
+            var captain = document.getElementById("captain")
+            if (name.value == "" || rank.value == 0 || captain.value == 0 || timetable.value == 0) {
+                alert("please fill out all required fields");
+                return false;
+            }
+            //
             var PlayerListElements = PlayerList.getElementsByClassName("FormSection");
             console.log(PlayerListElements)
             var str = "[";

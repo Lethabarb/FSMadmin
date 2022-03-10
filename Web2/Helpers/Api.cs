@@ -46,6 +46,16 @@ namespace Web2.Helpers
         {
             return await client.GetFromJsonAsync<List<Login>>("/logins");
         }
+        public async Task<List<Organisation>> GetOrganisations()
+        {
+            var orgs = await client.GetFromJsonAsync<List<Organisation>>("/Organisation/getall");
+            var allteams = await GetTeams();
+            foreach (Organisation org in orgs)
+            {
+                org.teams = allteams.Where(t => t.organisationId == org.id).ToList();
+            }
+            return orgs;
+        }
         public async Task<Organisation> GetOrganisation(int UserId)
         {
             List<OrganisationUsers> organisationUsers = await client.GetFromJsonAsync<List<OrganisationUsers>>("/OrganisationUsers");
@@ -54,6 +64,28 @@ namespace Web2.Helpers
             Org.teams = teams;
             Org.teams = Org.teams.Where(t => t.organisationId == Org.id).ToList();
             return Org;
+        }
+        public async Task<int> getUserId(string Email)
+        {
+            User res = await client.GetFromJsonAsync<User>($"/User/{Email}");
+            return res.Id;
+
+        }
+        public async Task<bool> AddUsertoOrg(int UserId, Guid orgId, User user)
+        {
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", user.token);
+            var res = await client.PostAsJsonAsync<OrganisationUsers>("/Organisation/AddUser", new()
+            {
+                OrgId = orgId,
+                UserId = UserId
+            });
+            return res.IsSuccessStatusCode;
+        }
+        public async Task<bool> IsUserInOrg(int UserId)
+        {
+            List<OrganisationUsers> organisationUsers = await client.GetFromJsonAsync<List<OrganisationUsers>>("/OrganisationUsers");
+            return organisationUsers.Exists(u => u.UserId == UserId);
+
         }
         public async Task<bool> CreateOrganisation(Organisation org, User user)
         {

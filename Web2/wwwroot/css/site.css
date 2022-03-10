@@ -376,6 +376,7 @@ footer {
     width: 100vw;
     height: 100vh;
     cursor: pointer;
+    z-index:2;
 }
 
 .AddScrimTeams {
@@ -871,4 +872,22 @@ svg {
     font-size: 15px;
     font-weight: bold;
     text-decoration: none;
+}
+#ShareButt {
+    width:fit-content;
+}
+.Modal {
+    left:30vw;
+    top:30vh;
+    position: absolute;
+    background-color: rgb(15, 15, 15);
+    border-radius: 20px;
+    width: 40vw;
+    height: 40vh;
+    display: none;
+    z-index:3;
+}
+.CenterDiv {
+    width:100%;
+    text-align:center;
 }

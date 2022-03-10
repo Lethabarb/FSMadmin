@@ -24,7 +24,8 @@ namespace Web2.Controllers
             ScrimList scrimlist = new()
             {
                 scrims = scrims,
-                teams = teams.Where(t => t.organisationId == org.id),
+                teams = teams,
+                myTeams = teams.Where(t => t.organisationId == org.id),
             };
             return View("Scrims", scrimlist);
         }
@@ -52,7 +53,8 @@ namespace Web2.Controllers
             ScrimList scrimlist = new()
             {
                 scrims = scrims,
-                teams = teams.Where(t => t.organisationId == org.id),
+                teams = teams,
+                myTeams = teams.Where(t => t.organisationId == org.id),
             };
             return View("Scrims", scrimlist);
         }
@@ -77,6 +79,12 @@ namespace Web2.Controllers
             scrim.teams = await api.GetTeams();
             return View("EditScrim", scrim);
         }
+        public async Task<IActionResult> EditScrim2(int id)
+        {
+            var Scrims = await api.GetScrims();
+            Scrim scrim = Scrims.Where(s => s.id == id).FirstOrDefault();
+            return View("EditScrim", scrim);
+        }
         public async Task<IActionResult> ScrimEdit(int id, Guid Team1, Guid Team2, DateTime datetime)
         {
             Organisation org = await userManager.GetOrganisation();
@@ -98,8 +106,15 @@ namespace Web2.Controllers
             };
             return View("Scrims", scrimlist);
         }
+        //public static long UnixTimestampFromDateTime(DateTime date)
+        //{
+        //    long unixTimestamp = date.Ticks - new DateTime(1970, 1, 1).Ticks;
+        //    unixTimestamp /= TimeSpan.TicksPerSecond;
+        //    return unixTimestamp;
+        //}
         public async Task<IActionResult> ScrimReminder(string raction, string controller, object? routevalues)
         {
+
             List<Scrim> scrims = await api.GetScrims();
             scrims = scrims.Where(s => s.datetime.Date >= DateTime.Today.Date).ToList();
             List<Team> teams = await api.GetTeams();
@@ -115,17 +130,130 @@ namespace Web2.Controllers
                         new EmbedFieldBuilder().WithName("Team2").WithValue(team[1].name).WithIsInline(true),
                         new EmbedFieldBuilder().WithName("Time").WithValue(s.datetime.TimeOfDay).WithIsInline(false)
                     };
-                    EmbedBuilder em = new EmbedBuilder()
-                        .WithAuthor("FSM scrim management")
+                    long unix = new DateTimeOffset(s.datetime.Year, s.datetime.Month, s.datetime.Day, s.datetime.Hour, s.datetime.Minute, s.datetime.Second, TimeSpan.Zero).ToUnixTimeSeconds() - 39600;
+                    var em = new EmbedBuilder
+                    {
+                        Description = $"<t:{unix}:t>"
+                        // Embed property can be set within object initializer
+                    };
+                    // Or with methods
+                    var Team1Capt = await discord.getUser(team[0].captain);
+                    var Team2Capt = await discord.getUser(team[1].captain);
+                    string team1bnet = team[0].players.Where(p => p.discord == $"{Team1Capt.Username}#{Team2Capt.DiscriminatorValue.ToString().PadLeft(4, '0')}").FirstOrDefault().battlenet;
+                    string team2bnet = team[1].players.Where(p => p.discord == $"{Team2Capt.Username}#{Team2Capt.DiscriminatorValue.ToString().PadLeft(4, '0')}").FirstOrDefault().battlenet;
+
+                    em.AddField(team[0].name, team1bnet, true)
+                        .WithAuthor("Scrim Tomorrow!")
+                        .WithFooter(footer => footer.Text = "FSM scrim management")
                         .WithColor(new Color(0, 255, 255))
-                        .WithCurrentTimestamp()
-                        .WithTitle("ScrimNotification")
-                        .WithFields(fields);
-                    await discord.SendUserMessage(em.Build(), team[0].captain);
-                    await discord.SendUserMessage(em.Build(), team[1].captain);
+                        .WithCurrentTimestamp();
+                    em.AddField("Vs", "-", true);
+                    em.AddField(team[1].name, team2bnet, true);
+                    Embed m = em.Build();
+                    await discord.SendUserMessage(m, team[0].captain);
+                    await discord.SendUserMessage(m, team[1].captain);
+                }
+                if (s.datetime.Date == DateTime.Today.Date.AddDays(1))
+                {
+                    var team = teams.Where(t => t.id == s.Team1 || t.id == s.Team2).ToArray();
+                    List<EmbedFieldBuilder> fields = new()
+                    {
+                        new EmbedFieldBuilder().WithName("Team1").WithValue(team[0].name).WithIsInline(true),
+                        new EmbedFieldBuilder().WithValue("vs").WithIsInline(true),
+                        new EmbedFieldBuilder().WithName("Team2").WithValue(team[1].name).WithIsInline(true),
+                        new EmbedFieldBuilder().WithName("Time").WithValue(s.datetime.TimeOfDay).WithIsInline(false)
+                    };
+                    long unix = new DateTimeOffset(s.datetime.Year, s.datetime.Month, s.datetime.Day, s.datetime.Hour, s.datetime.Minute, s.datetime.Second, TimeSpan.Zero).ToUnixTimeSeconds() - 39600;
+
+                    var em = new EmbedBuilder
+                    {
+                        Description = $"<t:{unix}:f>"
+                        // Embed property can be set within object initializer
+                    };
+                    // Or with methods
+                    var Team1Capt = await discord.getUser(team[0].captain);
+                    var Team2Capt = await discord.getUser(team[1].captain);
+                    string team1bnet = team[0].players.Where(p => p.discord == $"{Team1Capt.Username}#{Team2Capt.DiscriminatorValue.ToString().PadLeft(4, '0')}").FirstOrDefault().battlenet;
+                    string team2bnet = team[1].players.Where(p => p.discord == $"{Team2Capt.Username}#{Team2Capt.DiscriminatorValue.ToString().PadLeft(4, '0')}").FirstOrDefault().battlenet;
+                    
+                    em.AddField(team[0].name, team1bnet, true)
+                        .WithAuthor("Scrim Tomorrow!")
+                        .WithFooter(footer => footer.Text = "FSM scrim management")
+                        .WithColor(new Color(0, 255, 255))
+                        .WithCurrentTimestamp();
+                    em.AddField("Vs", "-", true);
+                    em.AddField(team[1].name, team2bnet, true);
+                    Embed m = em.Build();
+                    await discord.SendUserMessage(m, team[0].captain);
+                    await discord.SendUserMessage(m, team[1].captain);
                 }
             }
             return RedirectToAction(raction, controller, routevalues);
+        }
+        public string getScrimEnemy(Team t, Scrim s, List<Team> teams)
+        {
+            if (t.id == s.Team1)
+            {
+                return teams.Where(team => team.id == s.Team2).FirstOrDefault().name;
+            } else
+            {
+                return t.name;
+            }
+        }
+        public async Task<IActionResult> UpdateTimetables(string raction, string controller, object? routevalues)
+        {
+            var orgs = await api.GetOrganisations();
+            var allScrims = await api.GetScrims();
+            var allTeams = await api.GetTeams();
+            foreach (Organisation o in orgs.Where(o => o.id != new Guid("68ae694f-6055-4348-869d-c22780e255d4")))
+            {
+                foreach (Team t in o.teams)
+                {
+                    int today = (int)DateTime.Today.DayOfWeek;
+                    today *= -1;
+                    List<Scrim> scrims = allScrims.Where(s => s.Team2 == t.id || s.Team1 == t.id).ToList();
+                    ulong channel = o.Config.Teams.Where(team => team.Name == t.name).FirstOrDefault().TimetableId;
+                    scrims = scrims.OrderBy(s => s.datetime).ToList();
+                    scrims.Reverse();
+                    scrims = scrims.Where(s => DateTime.Today.CompareTo(s.datetime) <= 0).ToList();
+                    await discord.deleteMessages(channel);
+                    foreach (Scrim scrim in scrims)
+                    { if (scrim.datetime > DateTime.Today.AddDays(7 - (today * -1)))
+                        {
+                            EmbedBuilder timetable = new EmbedBuilder()
+                            {
+                                Title = $"{getScrimEnemy(t,scrim,allTeams)}, in {scrim.datetime.Subtract(DateTime.Today).Days} days"
+                            };
+                            timetable.AddField(scrim.datetime.ToShortTimeString(), scrim.datetime.ToShortDateString());
+                            await discord.SendMessage(timetable.Build(), channel);
+                        }
+
+                    }
+                    scrims.Reverse();
+                    scrims = scrims.Where(s => s.datetime >= DateTime.Today.AddDays(today) && s.datetime <= DateTime.Today.AddDays(7 - (today * -1))).ToList();
+                    
+                    
+                    if (channel != 0)
+                    {
+                        EmbedBuilder week = new EmbedBuilder()
+                        {
+                            Title = $"{t.name} Week TimeTable"
+                        };
+                        string[] days = {"Sun", "Mon", "Tues", "Wed", "Thurs", "Fri", "Sat" };
+                        foreach (Scrim s in scrims)
+                        {
+                            week.AddField(days[(int)s.datetime.DayOfWeek], $"{getScrimEnemy(t, s, allTeams)} @ {s.datetime.ToShortTimeString()}", false);
+                        }
+                        await discord.SendMessage(week.Build(), channel);
+                    }
+                }
+            }
+            return RedirectToAction(raction, controller, routevalues);
+        }
+        public async Task<IActionResult> ScrimDelete(int id)
+        {
+            await api.DeleteScrim(id, userManager.GetUser());
+            return RedirectToAction("Scrims");
         }
     }
 }

@@ -8,6 +8,7 @@ namespace Web2.Controllers
     public class AccountController : Controller
     {
         private readonly UserHelper UserManager;
+        private readonly Api api = new Api();
         public AccountController(UserHelper _UserManager)
         {
             UserManager = _UserManager;
@@ -31,7 +32,7 @@ namespace Web2.Controllers
             {
                 return View("~/Views/Account/Login.cshtml", res);
             }
-            if (await UserManager.GetLoginCount() == 1)
+            if (await UserManager.GetLoginCount() == 1 && !(await api.IsUserInOrg(UserManager.GetUserId())))
             {
                 return View("~/Views/Organisation/CreateOrganisation.cshtml");
             }
