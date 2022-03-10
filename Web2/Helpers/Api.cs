@@ -7,7 +7,7 @@ namespace Web2.Helpers
     {
         private readonly HttpClient client = new HttpClient()
         {
-            BaseAddress = new Uri("https://localhost:7290"),
+            BaseAddress = new Uri("https://fsmorgapi.azurewebsites.net"),
         };
 
         public async Task<User> Login(string email, string password)
