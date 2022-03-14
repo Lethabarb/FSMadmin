@@ -19,6 +19,7 @@ namespace Web2.Controllers
         }
         public IActionResult Login()
         {
+            HttpContext.Response.Cookies.Append("UserManager", Newtonsoft.Json.JsonConvert.SerializeObject(UserManager));
             return View("Login", new User()
             {
                 EmailAddress = "",

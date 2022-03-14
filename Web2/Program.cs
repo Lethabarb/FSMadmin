@@ -1,12 +1,13 @@
 using Discord;
 using Discord.WebSocket;
 using Web2.Helpers;
+using Web2.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-builder.Services.AddSingleton<UserHelper>();
+//builder.Services.AddSingleton<UserHelper>();
 DiscordSocketConfig discordConfig = new DiscordSocketConfig()
 {
     GatewayIntents = GatewayIntents.All,
@@ -14,6 +15,7 @@ DiscordSocketConfig discordConfig = new DiscordSocketConfig()
 };
 builder.Services.AddSingleton<DiscordSocketClient>(new DiscordSocketClient(discordConfig));
 builder.Services.AddSingleton<DiscordHelper>();
+builder.Services.AddTransient<UserHelper>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
