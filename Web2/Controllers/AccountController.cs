@@ -28,7 +28,7 @@ namespace Web2.Controllers
         public async Task<IActionResult> LoginUser(string email, string password)
         {
             var res = await UserManager.Login(email, password);
-            //SignInManager.SignInAsync
+            //SignInManager.SignInAsyncs
             if (res.EmailAddress == "Invalid")
             {
                 return View("~/Views/Account/Login.cshtml", res);
