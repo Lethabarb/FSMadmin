@@ -15,7 +15,7 @@ DiscordSocketConfig discordConfig = new DiscordSocketConfig()
 };
 builder.Services.AddSingleton<DiscordSocketClient>(new DiscordSocketClient(discordConfig));
 builder.Services.AddSingleton<DiscordHelper>();
-builder.Services.AddTransient<UserHelper>();
+builder.Services.AddSingleton<UserHelper>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
