@@ -10,7 +10,7 @@ builder.Services.AddControllersWithViews();
 //builder.Services.AddSingleton<UserHelper>();
 DiscordSocketConfig discordConfig = new DiscordSocketConfig()
 {
-    GatewayIntents = GatewayIntents.All,
+    GatewayIntents = GatewayIntents.Guilds | GatewayIntents.GuildMembers | GatewayIntents.GuildMessages | GatewayIntents.DirectMessages,
     MessageCacheSize = 100
 };
 builder.Services.AddSingleton<DiscordSocketClient>(new DiscordSocketClient(discordConfig));
