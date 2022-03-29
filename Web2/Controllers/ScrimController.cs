@@ -114,15 +114,15 @@ namespace Web2.Controllers
         //}
         public async Task<IActionResult> ScrimReminder(string raction, string controller, object? routevalues)
         {
-
+            Organisation org = await userManager.GetOrganisation();
             List<Scrim> scrims = await api.GetScrims();
+            List<Team> allteams = await api.GetTeams();
             scrims = scrims.Where(s => s.datetime.Date >= DateTime.Today.Date).ToList();
-            List<Team> teams = await api.GetTeams();
             foreach (Scrim s in scrims)
             {
                 if (s.datetime.Date == DateTime.Today.Date)
                 {
-                    var team = teams.Where(t => t.id == s.Team1 || t.id == s.Team2).ToArray();
+                    Team[] team = allteams.Where(t => t.id == s.Team1 || t.id == s.Team2).ToArray();
                     List<EmbedFieldBuilder> fields = new()
                     {
                         new EmbedFieldBuilder().WithName("Team1").WithValue(team[0].name).WithIsInline(true),
@@ -133,15 +133,30 @@ namespace Web2.Controllers
                     long unix = new DateTimeOffset(s.datetime.Year, s.datetime.Month, s.datetime.Day, s.datetime.Hour, s.datetime.Minute, s.datetime.Second, TimeSpan.Zero).ToUnixTimeSeconds() - 39600;
                     var em = new EmbedBuilder
                     {
-                        Description = $"<t:{unix}:t>"
+                        Description = $"{unix}"
+
                         // Embed property can be set within object initializer
                     };
                     // Or with methods
-                    var Team1Capt = await discord.getUser(team[0].captain);
-                    var Team2Capt = await discord.getUser(team[1].captain);
-                    string team1bnet = team[0].players.Where(p => p.discord == $"{Team1Capt.Username}#{Team2Capt.DiscriminatorValue.ToString().PadLeft(4, '0')}").FirstOrDefault().battlenet;
-                    string team2bnet = team[1].players.Where(p => p.discord == $"{Team2Capt.Username}#{Team2Capt.DiscriminatorValue.ToString().PadLeft(4, '0')}").FirstOrDefault().battlenet;
-
+                    var Team1Capt = await discord.getUser(team[0].captain, org.guildId);
+                    var Team2Capt = await discord.getUser(team[1].captain, org.guildId);
+                    string team1bnet; 
+                    string team2bnet;
+                    try
+                    {
+                        team1bnet = team[0].players.Where(p => p.discord == $"{Team1Capt.Username}#{Team2Capt.DiscriminatorValue.ToString().PadLeft(4, '0')}").FirstOrDefault().battlenet;
+                    } catch
+                    {
+                        team1bnet = team[0].players.First().battlenet;
+                    }
+                    try
+                    {
+                        team2bnet = team[1].players.Where(p => p.discord == $"{Team1Capt.Username}#{Team2Capt.DiscriminatorValue.ToString().PadLeft(4, '0')}").FirstOrDefault().battlenet;
+                    }
+                    catch
+                    {
+                        team2bnet = team[1].players.First().battlenet;
+                    }
                     em.AddField(team[0].name, team1bnet, true)
                         .WithAuthor("Scrim Tomorrow!")
                         .WithFooter(footer => footer.Text = "FSM scrim management")
@@ -150,12 +165,22 @@ namespace Web2.Controllers
                     em.AddField("Vs", "-", true);
                     em.AddField(team[1].name, team2bnet, true);
                     Embed m = em.Build();
-                    await discord.SendUserMessage(m, team[0].captain);
-                    await discord.SendUserMessage(m, team[1].captain);
+                    try
+                    {
+                        await discord.SendUserMessage(m, team[0].captain);
+
+                    }
+                    catch (Exception ex) { }
+                    try
+                    {
+                        await discord.SendUserMessage(m, team[1].captain);
+
+                    }
+                    catch (Exception ex) { }
                 }
                 if (s.datetime.Date == DateTime.Today.Date.AddDays(1))
                 {
-                    var team = teams.Where(t => t.id == s.Team1 || t.id == s.Team2).ToArray();
+                    Team[] team = allteams.Where(t => t.id == s.Team1 || t.id == s.Team2).ToArray();
                     List<EmbedFieldBuilder> fields = new()
                     {
                         new EmbedFieldBuilder().WithName("Team1").WithValue(team[0].name).WithIsInline(true),
@@ -167,15 +192,30 @@ namespace Web2.Controllers
 
                     var em = new EmbedBuilder
                     {
-                        Description = $"<t:{unix}:f>"
+                        Description = $"{unix}"
                         // Embed property can be set within object initializer
                     };
                     // Or with methods
-                    var Team1Capt = await discord.getUser(team[0].captain);
-                    var Team2Capt = await discord.getUser(team[1].captain);
-                    string team1bnet = team[0].players.Where(p => p.discord == $"{Team1Capt.Username}#{Team2Capt.DiscriminatorValue.ToString().PadLeft(4, '0')}").FirstOrDefault().battlenet;
-                    string team2bnet = team[1].players.Where(p => p.discord == $"{Team2Capt.Username}#{Team2Capt.DiscriminatorValue.ToString().PadLeft(4, '0')}").FirstOrDefault().battlenet;
-                    
+                    var Team1Capt = await discord.getUser(team[0].captain, org.guildId);
+                    var Team2Capt = await discord.getUser(team[1].captain, org.guildId);
+                    string team1bnet;
+                    string team2bnet;
+                    try
+                    {
+                        team1bnet = team[0].players.Where(p => p.discord == $"{Team1Capt.Username}#{Team2Capt.DiscriminatorValue.ToString().PadLeft(4, '0')}").FirstOrDefault().battlenet;
+                    }
+                    catch
+                    {
+                        team1bnet = team[0].players.First().battlenet;
+                    }
+                    try
+                    {
+                        team2bnet = team[1].players.Where(p => p.discord == $"{Team1Capt.Username}#{Team2Capt.DiscriminatorValue.ToString().PadLeft(4, '0')}").FirstOrDefault().battlenet;
+                    }
+                    catch
+                    {
+                        team2bnet = team[1].players.First().battlenet;
+                    }
                     em.AddField(team[0].name, team1bnet, true)
                         .WithAuthor("Scrim Tomorrow!")
                         .WithFooter(footer => footer.Text = "FSM scrim management")
@@ -184,8 +224,18 @@ namespace Web2.Controllers
                     em.AddField("Vs", "-", true);
                     em.AddField(team[1].name, team2bnet, true);
                     Embed m = em.Build();
-                    await discord.SendUserMessage(m, team[0].captain);
-                    await discord.SendUserMessage(m, team[1].captain);
+                    try
+                    {
+                        await discord.SendUserMessage(m, team[0].captain);
+
+                    }
+                    catch (Exception ex) { }
+                    try
+                    {
+                        await discord.SendUserMessage(m, team[1].captain);
+
+                    }
+                    catch (Exception ex) { }
                 }
             }
             return RedirectToAction(raction, controller, routevalues);

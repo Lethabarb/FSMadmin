@@ -65,7 +65,7 @@ namespace Web2.Controllers
             //check captain is in roster
             if (myTeam)
             {
-                IUser captain = await discord.getUser(Captain);
+                IUser captain = await discord.getUser(Captain, org.guildId);
                 Player captainPlayer;
                 try
                 {
@@ -142,7 +142,7 @@ namespace Web2.Controllers
                 }
             }
             //IUser captain = await discord.getUser(Captain);
-            IUser captain = await discord.getUser(Captain);
+            IUser captain = await discord.getUser(Captain, org.guildId);
             Player captainPlayer = players.Find(p => p.discord == $"{captain.Username}#{captain.DiscriminatorValue.ToString().PadLeft(4, '0')}");
             if (captainPlayer == null)
             {
