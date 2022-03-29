@@ -141,6 +141,7 @@ namespace Web2.Controllers
                     await file.CopyToAsync(fileStream);
                 }
             }
+            //IUser captain = await discord.getUser(Captain);
             IUser captain = await discord.getUser(Captain);
             Player captainPlayer = players.Find(p => p.discord == $"{captain.Username}#{captain.DiscriminatorValue.ToString().PadLeft(4, '0')}");
             if (captainPlayer == null)

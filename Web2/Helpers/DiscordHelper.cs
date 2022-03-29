@@ -50,9 +50,9 @@ namespace Web2.Helpers
             var user = await client.GetUserAsync(id) as IUser;
             await user.SendMessageAsync("", false, message);
         }
-        public async Task<IUser> getUser(ulong id)
+        public async Task<IUser> getUser(ulong id, ulong guildId)
         {
-            var user = await client.GetUserAsync(id) as IUser;
+            var user = client.GetGuild(guildId).GetUser(id) as IUser;
             return user;
         }
         public async Task deleteMessages(ulong id)
