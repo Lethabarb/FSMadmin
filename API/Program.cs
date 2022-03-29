@@ -243,7 +243,7 @@ app.MapPost("/Organisation/create", ([FromServices] FSMContext context, Organisa
     return new Donkey() {
         Value = entity.id.ToString()
     };
-}).RequireAuthorization().Produces<Donkey>();
+}).AllowAnonymous().Produces<Donkey>();
 app.MapPut("/Organisation/update/{id}", ([FromServices] FSMContext context, Organisation entity, Guid id) =>
 {
     Organisation old = context.Set<Organisation>().Where(x => x.id == id).FirstOrDefault();
@@ -260,13 +260,13 @@ app.MapPut("/Organisation/update/{id}", ([FromServices] FSMContext context, Orga
     old.ImageName = entity.ImageName;
     old.ImagePath = entity.ImagePath;
     context.SaveChanges();
-}).RequireAuthorization();
+}).AllowAnonymous();
 app.MapDelete("/Organisation/delete/{id}", ([FromServices] FSMContext context, Guid id) =>
 {
     Organisation entity = context.Set<Organisation>().Where(x => x.id == id).FirstOrDefault();
     context.Set<Organisation>().Remove(entity);
     context.SaveChanges();
-}).RequireAuthorization();
+}).AllowAnonymous();
 //#######################################
 //#############PLAYERSS##################
 //#######################################
@@ -281,7 +281,7 @@ app.MapPost("/Player/create", ([FromServices] FSMContext context, Player entity)
 {
     context.Set<Player>().Add(entity);
     context.SaveChanges();
-}).RequireAuthorization();
+}).AllowAnonymous();
 app.MapPut("/Player/update/{id}", ([FromServices] FSMContext context, Player entity, int id) =>
 {
     Player old = context.Set<Player>().Where(x => x.id == id).FirstOrDefault();
@@ -289,13 +289,13 @@ app.MapPut("/Player/update/{id}", ([FromServices] FSMContext context, Player ent
     old.battlenet = entity.battlenet;
     old.prole = entity.prole;
     context.SaveChanges();
-}).RequireAuthorization();
+}).AllowAnonymous();
 app.MapDelete("/Player/delete/{id}", ([FromServices] FSMContext context, int id) =>
 {
     Player entity = context.Set<Player>().Where(x => x.id == id).FirstOrDefault();
     context.Set<Player>().Remove(entity);
     context.SaveChanges();
-}).RequireAuthorization();
+}).AllowAnonymous();
 
 //#######################################
 //#############SCRIMS##################
@@ -306,12 +306,12 @@ app.MapGet("/Scrim/getall", ([FromServices] FSMContext context) => {
 app.MapGet("/Scrim/get/{id}", ([FromServices] FSMContext context, int id) =>
 {
     return context.Set<Scrim>().Where(x => x.id == id).FirstOrDefault();
-}).RequireAuthorization();
+}).AllowAnonymous();
 app.MapPost("/Scrim/create", ([FromServices] FSMContext context, Scrim entity) =>
 {
     context.Set<Scrim>().Add(entity);
     context.SaveChanges();
-}).RequireAuthorization();
+}).AllowAnonymous();
 app.MapPut("/Scrim/update/{id}", ([FromServices] FSMContext context, Scrim entity, int id) =>
 {
     Scrim old = context.Set<Scrim>().Where(x => x.id == id).FirstOrDefault();
@@ -319,13 +319,13 @@ app.MapPut("/Scrim/update/{id}", ([FromServices] FSMContext context, Scrim entit
     old.Team2 = entity.Team2;
     old.datetime = entity.datetime;
     context.SaveChanges();
-}).RequireAuthorization();
+}).AllowAnonymous();
 app.MapDelete("/Scrim/delete/{id}", ([FromServices] FSMContext context, int id) =>
 {
     Scrim entity = context.Set<Scrim>().Where(x => x.id == id).FirstOrDefault();
     context.Set<Scrim>().Remove(entity);
     context.SaveChanges();
-}).RequireAuthorization();
+}).AllowAnonymous();
 //#######################################
 //#############TEAMS##################
 //#######################################
@@ -346,7 +346,7 @@ app.MapPost("/Team/create", ([FromServices] FSMContext context, Team entity) =>
     }
     context.Set<Team>().Add(entity);
     context.SaveChanges();
-}).RequireAuthorization();
+}).AllowAnonymous();
 app.MapPut("/Team/update/{id}", ([FromServices] FSMContext context, Team entity, Guid id) =>
 {
     Team old = context.Set<Team>().Where(x => x.id == id).FirstOrDefault();
@@ -361,7 +361,7 @@ app.MapPut("/Team/update/{id}", ([FromServices] FSMContext context, Team entity,
     old.ImageName = entity.ImageName;
     old.ImagePath = entity.ImagePath;
     context.SaveChanges();
-}).RequireAuthorization();
+}).AllowAnonymous();
 app.MapDelete("/Team/delete/{id}", ([FromServices] FSMContext context, Guid id) =>
 {
     Team entity = context.Set<Team>().Where(x => x.id == id).FirstOrDefault();
@@ -372,7 +372,7 @@ app.MapDelete("/Team/delete/{id}", ([FromServices] FSMContext context, Guid id) 
         context.Set<Player>().Remove(p);
     }
     context.SaveChanges();
-}).RequireAuthorization();
+}).AllowAnonymous();
 
 app.MapPost("/Organisation/AddUser", ([FromServices] FSMContext context, OrganisationUsers entity) =>
 {
@@ -381,7 +381,7 @@ app.MapPost("/Organisation/AddUser", ([FromServices] FSMContext context, Organis
         context.Set<OrganisationUsers>().Add(entity);
         context.SaveChanges();
     }
-}).RequireAuthorization();
+}).AllowAnonymous();
 
 
 app.MapGet("/OrganisationUsers", ([FromServices] FSMContext context) => {
