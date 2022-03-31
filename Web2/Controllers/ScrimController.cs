@@ -133,7 +133,7 @@ namespace Web2.Controllers
                     long unix = new DateTimeOffset(s.datetime.Year, s.datetime.Month, s.datetime.Day, s.datetime.Hour, s.datetime.Minute, s.datetime.Second, TimeSpan.Zero).ToUnixTimeSeconds() - 39600;
                     var em = new EmbedBuilder
                     {
-                        Description = $"{unix}"
+                        Description = $" <t:{unix}:F> ,{unix}"
 
                         // Embed property can be set within object initializer
                     };
@@ -192,7 +192,7 @@ namespace Web2.Controllers
 
                     var em = new EmbedBuilder
                     {
-                        Description = $"{unix}"
+                        Description = $" <t:{unix}:F> ,{unix}"
                         // Embed property can be set within object initializer
                     };
                     // Or with methods
