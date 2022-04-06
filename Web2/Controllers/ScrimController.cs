@@ -138,8 +138,22 @@ namespace Web2.Controllers
                         // Embed property can be set within object initializer
                     };
                     // Or with methods
-                    var Team1Capt = await discord.getUser(team[0].captain, org.guildId);
-                    var Team2Capt = await discord.getUser(team[1].captain, org.guildId);
+                    IUser Team1Capt;
+                    try
+                    {
+                        Team1Capt = await discord.getUser(team[0].captain, org.guildId);
+                    } catch (Exception e) {
+                        Team1Capt = await discord.getUser(251578157822509057, org.guildId);
+                    }
+                    IUser Team2Capt;
+                    try
+                    {
+                        Team2Capt = await discord.getUser(team[1].captain, org.guildId);
+                    }
+                    catch (Exception e)
+                    {
+                        Team2Capt = await discord.getUser(251578157822509057, org.guildId);
+                    }
                     string team1bnet; 
                     string team2bnet;
                     try
