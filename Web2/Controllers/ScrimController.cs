@@ -171,6 +171,7 @@ namespace Web2.Controllers
                     {
                         team2bnet = team[1].players.First().battlenet;
                     }
+
                     em.AddField(team[0].name, team1bnet, true)
                         .WithAuthor("Scrim Tomorrow!")
                         .WithFooter(footer => footer.Text = "FSM scrim management")
